@@ -35,69 +35,52 @@ void RoomRender::initialise()
     // Initialize OpenGL resources here
     createShaders();
 
-    //roomSize = Vector3D<float>(5.0f, 5.0f, 5.0f);
+    roomSize = Vector3D<float>(5.0f, 10.0f, 5.0f);
 
-    //std::vector<float> walls{
-    //    //Position            //Texture                //ID
-    //    -0.5f, -0.5f, -0.5f,  0.0f,       0.0f,        0.0f,
-    //     0.5f, -0.5f, -0.5f,  roomSize.x, 0.0f,        0.0f,
-    //     0.5f,  0.5f, -0.5f,  roomSize.x, roomSize.y,  0.0f,
-    //     0.5f,  0.5f, -0.5f,  roomSize.x, roomSize.y,  0.0f,
-    //    -0.5f,  0.5f, -0.5f,  0.0f,       roomSize.y,  0.0f,
-    //    -0.5f, -0.5f, -0.5f,  0.0f,       0.0f,        0.0f,
+    std::vector<float> walls{
+        //Position            //Texture                //ID
+        -0.5f, -0.5f, -0.5f,  0.0f,       0.0f,        0.0f,
+         0.5f, -0.5f, -0.5f,  roomSize.x, 0.0f,        0.0f,
+         0.5f,  0.5f, -0.5f,  roomSize.x, roomSize.y,  0.0f,
+        -0.5f,  0.5f, -0.5f,  0.0f,       roomSize.y,  0.0f,
 
-    //    -0.5f, -0.5f,  0.5f,  0.0f,       0.0f,        0.0f,
-    //     0.5f, -0.5f,  0.5f,  roomSize.x, 0.0f,        0.0f,
-    //     0.5f,  0.5f,  0.5f,  roomSize.x, roomSize.y,  0.0f,
-    //     0.5f,  0.5f,  0.5f,  roomSize.x, roomSize.y,  0.0f,
-    //    -0.5f,  0.5f,  0.5f,  0.0f,       roomSize.y,  0.0f,
-    //    -0.5f, -0.5f,  0.5f,  0.0f,       0.0f,        0.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f,       0.0f,        0.0f,
+         0.5f, -0.5f,  0.5f,  roomSize.x, 0.0f,        0.0f,
+         0.5f,  0.5f,  0.5f,  roomSize.x, roomSize.y,  0.0f,
+        -0.5f,  0.5f,  0.5f,  0.0f,       roomSize.y,  0.0f,
 
-    //    -0.5f,  0.5f,  0.5f,  0.0f,       0.0f,        0.0f,
-    //    -0.5f,  0.5f, -0.5f,  roomSize.z, 0.0f,        0.0f,
-    //    -0.5f, -0.5f, -0.5f,  roomSize.z, roomSize.y,  0.0f,
-    //    -0.5f, -0.5f, -0.5f,  roomSize.z, roomSize.y,  0.0f,
-    //    -0.5f, -0.5f,  0.5f,  0.0f,       roomSize.y,  0.0f,
-    //    -0.5f,  0.5f,  0.5f,  0.0f,       0.0f,        0.0f,
+        -0.5f,  0.5f,  0.5f,  0.0f,       0.0f,        0.0f,
+        -0.5f,  0.5f, -0.5f,  roomSize.z, 0.0f,        0.0f,
+        -0.5f, -0.5f, -0.5f,  roomSize.z, roomSize.y,  0.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f,       roomSize.y,  0.0f,
 
-    //     0.5f,  0.5f,  0.5f,  0.0f,       0.0f,        0.0f,
-    //     0.5f,  0.5f, -0.5f,  roomSize.z, 0.0f,        0.0f,
-    //     0.5f, -0.5f, -0.5f,  roomSize.z, roomSize.y,  0.0f,
-    //     0.5f, -0.5f, -0.5f,  roomSize.z, roomSize.y,  0.0f,
-    //     0.5f, -0.5f,  0.5f,  0.0f,       roomSize.y,  0.0f,
-    //     0.5f,  0.5f,  0.5f,  0.0f,       0.0f,  0.0f
-    //};
+         0.5f,  0.5f,  0.5f,  0.0f,       0.0f,        0.0f,
+         0.5f,  0.5f, -0.5f,  roomSize.z, 0.0f,        0.0f,
+         0.5f, -0.5f, -0.5f,  roomSize.z, roomSize.y,  0.0f,
+         0.5f, -0.5f,  0.5f,  0.0f,       roomSize.y,  0.0f,
+    };
 
-    //std::vector<float> floor{
-    //    //Position            //Texture                //ID
-    //    -0.5f, -0.5f, -0.5f,  0.0f,       roomSize.z,  1.0f,
-    //     0.5f, -0.5f, -0.5f,  roomSize.x, roomSize.z,  1.0f,
-    //     0.5f, -0.5f,  0.5f,  roomSize.x, 0.0f,        1.0f,
-    //     0.5f, -0.5f,  0.5f,  roomSize.x, 0.0f,        1.0f,
-    //    -0.5f, -0.5f,  0.5f,  0.0f,       0.0f,        1.0f,
-    //    -0.5f, -0.5f, -0.5f,  0.0f,       roomSize.z,  1.0f
-    //};
+    std::vector<float> floor{
+        //Position            //Texture                //ID
+        -0.5f, -0.5f, -0.5f,  0.0f,       roomSize.z,  1.0f,
+         0.5f, -0.5f, -0.5f,  roomSize.x, roomSize.z,  1.0f,
+         0.5f, -0.5f,  0.5f,  roomSize.x, 0.0f,        1.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f,       0.0f,        1.0f,
+    };
 
-    //std::vector<float> ceiling{
-    //    //Position            //Texture                //ID
-    //    -0.5f,  0.5f, -0.5f,  0.0f,       roomSize.z,  2.0f,
-    //     0.5f,  0.5f, -0.5f,  roomSize.x, roomSize.z,  2.0f,
-    //     0.5f,  0.5f,  0.5f,  roomSize.x, 0.0f,        2.0f,
-    //     0.5f,  0.5f,  0.5f,  roomSize.x, 0.0f,        2.0f,
-    //    -0.5f,  0.5f,  0.5f,  0.0f,       0.0f,        2.0f,
-    //    -0.5f,  0.5f, -0.5f,  0.0f,       roomSize.z,  2.0f
-    //};
+    std::vector<float> ceiling{
+        //Position            //Texture                //ID
+        -0.5f,  0.5f, -0.5f,  0.0f,       roomSize.z,  2.0f,
+         0.5f,  0.5f, -0.5f,  roomSize.x, roomSize.z,  2.0f,
+         0.5f,  0.5f,  0.5f,  roomSize.x, 0.0f,        2.0f,
+        -0.5f,  0.5f,  0.5f,  0.0f,       0.0f,        2.0f,
+    };
 
-    auto& sharedData = SharedDataSingleton::getInstance();
-    std::lock_guard<std::mutex> lock(sharedData.vectorMutex);
-
-    sharedData.roomSize = Vector3D<float>(10.0f, 5.0f, 10.0f);
-
-    shape->addShapes(sharedData.walls, sharedData.floor, sharedData.ceiling);
+    shape->addShapes(walls, floor, ceiling);
 
     //shape->roomSize = roomSize;
     cameraPos = Vector3D<float>(1.0f, 1.0f, 1.0f);
-    roomPos = Vector3D<float>(sharedData.roomSize.x / 2, sharedData.roomSize.y / 2, sharedData.roomSize.z / 2);
+    roomPos = Vector3D<float>(roomSize.x / 2, roomSize.y / 2, roomSize.z / 2);
 
     camera = Camera(cameraPos, Vector3D<float>(0.0f, 1.0f, 0.0f), 0.0f);
 
@@ -122,9 +105,6 @@ void RoomRender::render()
     // Your OpenGL rendering code here
     // This clears the context with a black background.
     juce::OpenGLHelpers::clear(juce::Colours::black);
-
-    auto& sharedData = SharedDataSingleton::getInstance();
-    std::lock_guard<std::mutex> lock(sharedData.vectorMutex);
 
     // Add your rendering code here...
     using namespace ::juce::gl;
@@ -167,7 +147,7 @@ void RoomRender::render()
 
     Matrix3D<float> model;
     model = model.translation(roomPos);
-    model = model.scaled(sharedData.roomSize);
+    model = model.scaled(roomSize);
     if (uniforms->model.get() != nullptr)
         uniforms->model->setMatrix4(model.mat, 1, false);
 
@@ -180,8 +160,8 @@ void RoomRender::render()
 
     shape->draw(*attributes);
 
-
     glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
 

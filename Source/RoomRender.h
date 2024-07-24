@@ -168,9 +168,9 @@ private:
             {
                 vertexBuffers.clear(true);
             }
-            vertexBuffers.add(new VertexBuffer(verticesWalls, verticesWalls.size()/6));
-            vertexBuffers.add(new VertexBuffer(verticesFloor, verticesFloor.size()/6));
-            vertexBuffers.add(new VertexBuffer(verticesCeiling, verticesCeiling.size()/6));
+            vertexBuffers.add(new VertexBuffer(verticesWalls, verticesWalls.size()/4));
+            vertexBuffers.add(new VertexBuffer(verticesFloor, verticesFloor.size()/4));
+            vertexBuffers.add(new VertexBuffer(verticesCeiling, verticesCeiling.size()/4));
             //Add texture(s) and remove old ones if there are any
             if (textures.size() != 0)
             {
@@ -192,7 +192,8 @@ private:
             glAttributes.enable();
             glActiveTexture(GL_TEXTURE0);
             texture1.bind();
-            glDrawArrays(GL_TRIANGLES, 0, vertexBuffers[0]->numberTriangles);
+            //glDrawArrays(GL_TRIANGLES, 0, vertexBuffers[0]->numberTriangles);
+            glDrawElements(GL_TRIANGLES, 24, GL_UNSIGNED_INT, 0);
             glAttributes.disable();
 
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -202,7 +203,8 @@ private:
             glAttributes.enable();
             glActiveTexture(GL_TEXTURE1);
             texture2.bind();
-            glDrawArrays(GL_TRIANGLES, 0, vertexBuffers[1]->numberTriangles);
+            //glDrawArrays(GL_TRIANGLES, 0, vertexBuffers[1]->numberTriangles);
+            glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
             glAttributes.disable();
 
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -212,7 +214,8 @@ private:
             glAttributes.enable();
             glActiveTexture(GL_TEXTURE2);
             texture3.bind();
-            glDrawArrays(GL_TRIANGLES, 0, vertexBuffers[2]->numberTriangles);
+            //glDrawArrays(GL_TRIANGLES, 0, vertexBuffers[2]->numberTriangles);
+            glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
             glAttributes.disable();
 
         }
@@ -239,6 +242,11 @@ private:
                 glBufferData(GL_ARRAY_BUFFER,
                     static_cast<GLsizeiptr> (static_cast<size_t> (vertices.size()) * sizeof(Vertex)),
                     vertices.getRawDataPointer(), GL_STATIC_DRAW);
+
+                glGenBuffers(1, &indexBuffer);
+                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer);
+
+                glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
             }
 
             ~VertexBuffer()
@@ -246,6 +254,7 @@ private:
                 using namespace ::juce::gl;
 
                 glDeleteBuffers(1, &vertexBuffer);
+                glDeleteBuffers(1, &indexBuffer);
             }
 
             void bind()
@@ -253,10 +262,23 @@ private:
                 using namespace ::juce::gl;
 
                 glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
+                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer);
             }
 
-            GLuint vertexBuffer;
+            GLuint vertexBuffer, indexBuffer;
             int numberTriangles;
+
+            unsigned int indices[24] = {  // note that we start from 0!
+                0, 1, 3,   // first triangle
+                1, 2, 3,   // second triangle
+                4, 5, 7,   // first triangle
+                5, 6, 7,   // second triangle
+                8, 9, 11,   // first triangle
+                9, 10, 11,   // second triangle
+                12, 13, 15,   // first triangle
+                13, 14, 15    // second triangle
+            };
+
 
             JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(VertexBuffer)
         };
@@ -285,63 +307,6 @@ private:
 
         Vector3D<float> roomSize;
 
-        //std::vector<float> verticesWalls{
-        //    //Position            //Texture                //ID
-        //    -0.5f, -0.5f, -0.5f,  0.0f,       0.0f,        0.0f,
-        //     0.5f, -0.5f, -0.5f,  roomSize.x, 0.0f,        0.0f,
-        //     0.5f,  0.5f, -0.5f,  roomSize.x, roomSize.y,  0.0f,
-        //     0.5f,  0.5f, -0.5f,  roomSize.x, roomSize.y,  0.0f,
-        //    -0.5f,  0.5f, -0.5f,  0.0f,       roomSize.y,  0.0f,
-        //    -0.5f, -0.5f, -0.5f,  0.0f,       0.0f,        0.0f,
-
-        //    -0.5f, -0.5f,  0.5f,  0.0f,       0.0f,        0.0f,
-        //     0.5f, -0.5f,  0.5f,  roomSize.x, 0.0f,        0.0f,
-        //     0.5f,  0.5f,  0.5f,  roomSize.x, roomSize.y,  0.0f,
-        //     0.5f,  0.5f,  0.5f,  roomSize.x, roomSize.y,  0.0f,
-        //    -0.5f,  0.5f,  0.5f,  0.0f,       roomSize.y,  0.0f,
-        //    -0.5f, -0.5f,  0.5f,  0.0f,       0.0f,        0.0f,
-
-        //    -0.5f,  0.5f,  0.5f,  0.0f,       0.0f,        0.0f,
-        //    -0.5f,  0.5f, -0.5f,  roomSize.z, 0.0f,        0.0f,
-        //    -0.5f, -0.5f, -0.5f,  roomSize.z, roomSize.y,  0.0f,
-        //    -0.5f, -0.5f, -0.5f,  roomSize.z, roomSize.y,  0.0f,
-        //    -0.5f, -0.5f,  0.5f,  0.0f,       roomSize.y,  0.0f,
-        //    -0.5f,  0.5f,  0.5f,  0.0f,       0.0f,        0.0f,
-
-        //     0.5f,  0.5f,  0.5f,  0.0f,       0.0f,        0.0f,
-        //     0.5f,  0.5f, -0.5f,  roomSize.z, 0.0f,        0.0f,
-        //     0.5f, -0.5f, -0.5f,  roomSize.z, roomSize.y,  0.0f,
-        //     0.5f, -0.5f, -0.5f,  roomSize.z, roomSize.y,  0.0f,
-        //     0.5f, -0.5f,  0.5f,  0.0f,       roomSize.y,  0.0f,
-        //     0.5f,  0.5f,  0.5f,  0.0f,       0.0f,  0.0f
-        //};
-
-        //std::vector<float> verticesWalls{
-        //    // positions         // colors
-        //     0.5f, -0.5f, 0.0f,  0.0f, 0.0f,  0.0f,   // bottom right
-        //    -0.5f, -0.5f, 0.0f,  0.0f, 0.0f,  0.0f,   // bottom left
-        //     0.0f,  0.5f, 0.0f,  0.0f, 0.0f,  0.0f    // top 
-        //};
-
-        //std::vector<float> verticesFloor{
-        //    //Position            //Texture                //ID
-        //    -0.5f, -0.5f, -0.5f,  0.0f,       roomSize.z,  1.0f,
-        //     0.5f, -0.5f, -0.5f,  roomSize.x, roomSize.z,  1.0f,
-        //     0.5f, -0.5f,  0.5f,  roomSize.x, 0.0f,        1.0f,
-        //     0.5f, -0.5f,  0.5f,  roomSize.x, 0.0f,        1.0f,
-        //    -0.5f, -0.5f,  0.5f,  0.0f,       0.0f,        1.0f,
-        //    -0.5f, -0.5f, -0.5f,  0.0f,       roomSize.z,  1.0f
-        //};
-
-        //std::vector<float> verticesCeiling{
-        //    //Position            //Texture                //ID
-        //    -0.5f,  0.5f, -0.5f,  0.0f,       roomSize.z,  2.0f,
-        //     0.5f,  0.5f, -0.5f,  roomSize.x, roomSize.z,  2.0f,
-        //     0.5f,  0.5f,  0.5f,  roomSize.x, 0.0f,        2.0f,
-        //     0.5f,  0.5f,  0.5f,  roomSize.x, 0.0f,        2.0f,
-        //    -0.5f,  0.5f,  0.5f,  0.0f,       0.0f,        2.0f,
-        //    -0.5f,  0.5f, -0.5f,  0.0f,       roomSize.z,  2.0f
-        //};
 
     };
 
@@ -356,7 +321,7 @@ private:
     std::unique_ptr<Uniforms> uniforms;
 
     Camera camera;
-    Vector3D<float> cameraPos, roomPos;
+    Vector3D<float> roomSize, cameraPos, roomPos;
     float lastX = 0.0f, lastY = 0.0f;
     bool firstMouse = true;
 
