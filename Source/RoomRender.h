@@ -161,8 +161,34 @@ private:
         {
         }
         
-        void addShapes(std::vector<float> verticesWalls, std::vector<float> verticesFloor, std::vector<float> verticesCeiling)
+        void addShapes(std::vector<float> verticesWalls, std::vector<float> verticesFloor, std::vector<float> verticesCeiling, Vector3D<float> roomSize)
         {
+            //Modify the texture coordinates to accommodate size of room
+            verticesWalls.at(9) *= roomSize.x;
+            verticesWalls.at(15) *= roomSize.x;
+            verticesWalls.at(16) *= roomSize.y;
+            verticesWalls.at(22) *= roomSize.y;
+            verticesWalls.at(9 + 24) *= roomSize.x;
+            verticesWalls.at(15 + 24) *= roomSize.x;
+            verticesWalls.at(16 + 24) *= roomSize.y;
+            verticesWalls.at(22 + 24) *= roomSize.y;
+            verticesWalls.at(9 + 48) *= roomSize.z;
+            verticesWalls.at(15 + 48) *= roomSize.z;
+            verticesWalls.at(16 + 48) *= roomSize.y;
+            verticesWalls.at(22 + 48) *= roomSize.y;
+            verticesWalls.at(9 + 72) *= roomSize.z;
+            verticesWalls.at(15 + 72) *= roomSize.z;
+            verticesWalls.at(16 + 72) *= roomSize.y;
+            verticesWalls.at(22 + 72) *= roomSize.y;
+            verticesFloor.at(9) *= roomSize.x;
+            verticesFloor.at(15) *= roomSize.x;
+            verticesFloor.at(16) *= roomSize.z;
+            verticesFloor.at(22) *= roomSize.z;
+            verticesCeiling.at(9) *= roomSize.x;
+            verticesCeiling.at(15) *= roomSize.x;
+            verticesCeiling.at(16) *= roomSize.z;
+            verticesCeiling.at(22) *= roomSize.z;
+
             //Add shapes to vertex buffer and remove old vertices if there are any
             if (vertexBuffers.size() != 0)
             {
@@ -179,6 +205,11 @@ private:
             textures.add(new TextureFromFile(File("C:/Users/jstan/JUCE/Projects/RoomExample/Assets/Bricks060_1K-JPG_Color.jpg")));
             textures.add(new TextureFromFile(File("C:/Users/jstan/JUCE/Projects/RoomExample/Assets/Wood090A_1K-JPG_Color.jpg")));
             textures.add(new TextureFromFile(File("C:/Users/jstan/JUCE/Projects/RoomExample/Assets/Tiles136A_1K-JPG_Color.jpg")));
+        }
+
+        void modifyShapes(Vector3D<float> size)
+        {
+
         }
 
         void draw(Attributes& glAttributes)

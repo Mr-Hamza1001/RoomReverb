@@ -16,9 +16,10 @@ RoomReverbPluginAudioProcessorEditor::RoomReverbPluginAudioProcessorEditor (Room
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
     //Make room window visible
+    buttonProcess.addListener(this);
     addAndMakeVisible(roomRender);
-    //addAndMakeVisible(button1);
-    //addAndMakeVisible(button2);
+    addAndMakeVisible(buttonProcess);
+    addAndMakeVisible(button2);
     addAndMakeVisible(slider1);
     addAndMakeVisible(slider2);
     addAndMakeVisible(slider3);
@@ -30,19 +31,24 @@ RoomReverbPluginAudioProcessorEditor::RoomReverbPluginAudioProcessorEditor (Room
     juce::Grid grid;
     using Track = juce::Grid::TrackInfo;
 
-    grid.templateRows = { Track(1_fr), Track(1_fr), Track(1_fr) };
-    grid.templateColumns = { Track(1_fr), Track(1_fr), Track(1_fr), Track(1_fr) };
+    grid.templateRows = { Track(1_fr), Track(1_fr), Track(1_fr), Track(1_fr), Track(1_fr), Track(1_fr) };
+    grid.templateColumns = { Track(1_fr), Track(1_fr), Track(1_fr), Track(1_fr), Track(1_fr), Track(1_fr), Track(1_fr), Track(1_fr), Track(1_fr), Track(1_fr) };
 
     grid.items = { juce::GridItem(slider1).withArea(juce::GridItem::Span(1), juce::GridItem::Span(1)),
-                   juce::GridItem(roomRender).withArea(juce::GridItem::Span(2), juce::GridItem::Span(2)),
                    juce::GridItem(slider2).withArea(juce::GridItem::Span(1), juce::GridItem::Span(1)),
-                   juce::GridItem(slider3).withArea(juce::GridItem::Span(1), juce::GridItem::Span(1)) };
+                   juce::GridItem(roomRender).withArea(juce::GridItem::Span(5), juce::GridItem::Span(5)),
+                   juce::GridItem(slider3).withArea(juce::GridItem::Span(1), juce::GridItem::Span(1)),
+                   juce::GridItem(buttonProcess).withArea(juce::GridItem::Span(1), juce::GridItem::Span(1)),
+                   juce::GridItem(button2).withArea(juce::GridItem::Span(1), juce::GridItem::Span(1)) };
 
     grid.performLayout(getLocalBounds());
 }
 
 RoomReverbPluginAudioProcessorEditor::~RoomReverbPluginAudioProcessorEditor()
 {
+    buttonProcess.removeListener(this);
+
+    processReflections.stopThread(1000);
 }
 
 //==============================================================================
@@ -53,11 +59,23 @@ void RoomReverbPluginAudioProcessorEditor::paint (juce::Graphics& g)
 
     g.setColour (juce::Colours::white);
     g.setFont (juce::FontOptions (15.0f));
-    g.drawFittedText ("Hello World!", getLocalBounds(), juce::Justification::centred, 1);
+    g.drawFittedText ("Hello World!", getLocalBounds(), juce::Justification::centredBottom, 1);
 }
 
 void RoomReverbPluginAudioProcessorEditor::resized()
 {
     // This is generally where you'll want to lay out the positions of any
     // subcomponents in your editor..
+    
+}
+
+void RoomReverbPluginAudioProcessorEditor::buttonClicked(juce::Button* button)
+{
+    if (button == &buttonProcess)
+    {
+        DBG("Process button pressed!");
+
+        processReflections.startThread();
+
+    }
 }

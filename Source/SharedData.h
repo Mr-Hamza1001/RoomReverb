@@ -16,7 +16,50 @@
 
 struct SharedData
 {
-    std::vector<float> someVector;
+    //std::vector<float> someVector;
+
+    juce::Vector3D<float> roomSize, roomPos, listenerPos, soundSourcePos;
+
+    std::vector<float> walls{
+        //Position            //Texture    //ID
+        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,  0.0f,
+         0.5f, -0.5f, -0.5f,  1.0f, 0.0f,  0.0f,
+         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,  0.0f,
+        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,  0.0f,
+
+        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,  0.0f,
+         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,  0.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 1.0f,  0.0f,
+        -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,  0.0f,
+
+        -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,  0.0f,
+        -0.5f,  0.5f, -0.5f,  1.0f, 0.0f,  0.0f,
+        -0.5f, -0.5f, -0.5f,  1.0f, 1.0f,  0.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f, 1.0f,  0.0f,
+
+         0.5f,  0.5f,  0.5f,  0.0f, 0.0f,  0.0f,
+         0.5f,  0.5f, -0.5f,  1.0f, 0.0f,  0.0f,
+         0.5f, -0.5f, -0.5f,  1.0f, 1.0f,  0.0f,
+         0.5f, -0.5f,  0.5f,  0.0f, 1.0f,  0.0f,
+    };
+
+    std::vector<float> floor{
+        //Position            //Texture    //ID
+        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,  1.0f,
+         0.5f, -0.5f, -0.5f,  1.0f, 0.0f,  1.0f,
+         0.5f, -0.5f,  0.5f,  1.0f, 1.0f,  1.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f, 1.0f,  1.0f,
+    };
+
+    std::vector<float> ceiling{
+        //Position            //Texture    //ID
+        -0.5f,  0.5f, -0.5f,  0.0f, 0.0f,  2.0f,
+         0.5f,  0.5f, -0.5f,  1.0f, 0.0f,  2.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 1.0f,  2.0f,
+        -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,  2.0f,
+    };
+
+
 
     std::mutex vectorMutex;
 

@@ -35,57 +35,64 @@ void RoomRender::initialise()
     // Initialize OpenGL resources here
     createShaders();
 
-    roomSize = Vector3D<float>(5.0f, 10.0f, 5.0f);
+    //std::vector<float> walls{
+    //    //Position            //Texture                //ID
+    //    -0.5f, -0.5f, -0.5f,  0.0f,       0.0f,        0.0f,
+    //     0.5f, -0.5f, -0.5f,  roomSize.x, 0.0f,        0.0f,
+    //     0.5f,  0.5f, -0.5f,  roomSize.x, roomSize.y,  0.0f,
+    //    -0.5f,  0.5f, -0.5f,  0.0f,       roomSize.y,  0.0f,
 
-    std::vector<float> walls{
-        //Position            //Texture                //ID
-        -0.5f, -0.5f, -0.5f,  0.0f,       0.0f,        0.0f,
-         0.5f, -0.5f, -0.5f,  roomSize.x, 0.0f,        0.0f,
-         0.5f,  0.5f, -0.5f,  roomSize.x, roomSize.y,  0.0f,
-        -0.5f,  0.5f, -0.5f,  0.0f,       roomSize.y,  0.0f,
+    //    -0.5f, -0.5f,  0.5f,  0.0f,       0.0f,        0.0f,
+    //     0.5f, -0.5f,  0.5f,  roomSize.x, 0.0f,        0.0f,
+    //     0.5f,  0.5f,  0.5f,  roomSize.x, roomSize.y,  0.0f,
+    //    -0.5f,  0.5f,  0.5f,  0.0f,       roomSize.y,  0.0f,
 
-        -0.5f, -0.5f,  0.5f,  0.0f,       0.0f,        0.0f,
-         0.5f, -0.5f,  0.5f,  roomSize.x, 0.0f,        0.0f,
-         0.5f,  0.5f,  0.5f,  roomSize.x, roomSize.y,  0.0f,
-        -0.5f,  0.5f,  0.5f,  0.0f,       roomSize.y,  0.0f,
+    //    -0.5f,  0.5f,  0.5f,  0.0f,       0.0f,        0.0f,
+    //    -0.5f,  0.5f, -0.5f,  roomSize.z, 0.0f,        0.0f,
+    //    -0.5f, -0.5f, -0.5f,  roomSize.z, roomSize.y,  0.0f,
+    //    -0.5f, -0.5f,  0.5f,  0.0f,       roomSize.y,  0.0f,
 
-        -0.5f,  0.5f,  0.5f,  0.0f,       0.0f,        0.0f,
-        -0.5f,  0.5f, -0.5f,  roomSize.z, 0.0f,        0.0f,
-        -0.5f, -0.5f, -0.5f,  roomSize.z, roomSize.y,  0.0f,
-        -0.5f, -0.5f,  0.5f,  0.0f,       roomSize.y,  0.0f,
+    //     0.5f,  0.5f,  0.5f,  0.0f,       0.0f,        0.0f,
+    //     0.5f,  0.5f, -0.5f,  roomSize.z, 0.0f,        0.0f,
+    //     0.5f, -0.5f, -0.5f,  roomSize.z, roomSize.y,  0.0f,
+    //     0.5f, -0.5f,  0.5f,  0.0f,       roomSize.y,  0.0f,
+    //};
 
-         0.5f,  0.5f,  0.5f,  0.0f,       0.0f,        0.0f,
-         0.5f,  0.5f, -0.5f,  roomSize.z, 0.0f,        0.0f,
-         0.5f, -0.5f, -0.5f,  roomSize.z, roomSize.y,  0.0f,
-         0.5f, -0.5f,  0.5f,  0.0f,       roomSize.y,  0.0f,
-    };
+    //std::vector<float> floor{
+    //    //Position            //Texture                //ID
+    //    -0.5f, -0.5f, -0.5f,  0.0f,       roomSize.z,  1.0f,
+    //     0.5f, -0.5f, -0.5f,  roomSize.x, roomSize.z,  1.0f,
+    //     0.5f, -0.5f,  0.5f,  roomSize.x, 0.0f,        1.0f,
+    //    -0.5f, -0.5f,  0.5f,  0.0f,       0.0f,        1.0f,
+    //};
 
-    std::vector<float> floor{
-        //Position            //Texture                //ID
-        -0.5f, -0.5f, -0.5f,  0.0f,       roomSize.z,  1.0f,
-         0.5f, -0.5f, -0.5f,  roomSize.x, roomSize.z,  1.0f,
-         0.5f, -0.5f,  0.5f,  roomSize.x, 0.0f,        1.0f,
-        -0.5f, -0.5f,  0.5f,  0.0f,       0.0f,        1.0f,
-    };
+    //std::vector<float> ceiling{
+    //    //Position            //Texture                //ID
+    //    -0.5f,  0.5f, -0.5f,  0.0f,       roomSize.z,  2.0f,
+    //     0.5f,  0.5f, -0.5f,  roomSize.x, roomSize.z,  2.0f,
+    //     0.5f,  0.5f,  0.5f,  roomSize.x, 0.0f,        2.0f,
+    //    -0.5f,  0.5f,  0.5f,  0.0f,       0.0f,        2.0f,
+    //};
 
-    std::vector<float> ceiling{
-        //Position            //Texture                //ID
-        -0.5f,  0.5f, -0.5f,  0.0f,       roomSize.z,  2.0f,
-         0.5f,  0.5f, -0.5f,  roomSize.x, roomSize.z,  2.0f,
-         0.5f,  0.5f,  0.5f,  roomSize.x, 0.0f,        2.0f,
-        -0.5f,  0.5f,  0.5f,  0.0f,       0.0f,        2.0f,
-    };
-
-    shape->addShapes(walls, floor, ceiling);
+    auto& sharedData = SharedDataSingleton::getInstance();
+    std::lock_guard<std::mutex> lock(sharedData.vectorMutex);
+    roomSize = juce::Vector3D<float>(5.0f, 10.0f, 5.0f);
+    sharedData.roomSize = roomSize;
+    sharedData.soundSourcePos = juce::Vector3D<float>(2.5f, 5.0f, 2.5f);
 
     //shape->roomSize = roomSize;
     cameraPos = Vector3D<float>(1.0f, 1.0f, 1.0f);
-    roomPos = Vector3D<float>(roomSize.x / 2, roomSize.y / 2, roomSize.z / 2);
+    sharedData.listenerPos = cameraPos;
+    roomPos = roomSize / 2;
+    sharedData.roomPos = roomPos;
 
     camera = Camera(cameraPos, Vector3D<float>(0.0f, 1.0f, 0.0f), 0.0f);
 
     camera.lastX = width / 2;
     camera.lastY = height / 2;
+
+    //Add shapes
+    shape->addShapes(sharedData.walls, sharedData.floor, sharedData.ceiling, roomSize);
 }
 
 void RoomRender::shutdown()

@@ -4,6 +4,13 @@
               addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1">
   <MAINGROUP id="uOv3RL" name="RoomReverbPlugin">
     <GROUP id="{48374C04-3712-628F-ADF6-7BB869E12AC2}" name="Source">
+      <FILE id="DXo9Jt" name="jgs_Matrix3D.h" compile="0" resource="0" file="Source/jgs_Matrix3D.h"/>
+      <FILE id="MKza8c" name="jgs_Vector4D.h" compile="0" resource="0" file="Source/jgs_Vector4D.h"/>
+      <FILE id="DeogE4" name="Spherical.h" compile="0" resource="0" file="Source/Spherical.h"/>
+      <FILE id="Ky5HPT" name="ProcessReflections.cpp" compile="1" resource="0"
+            file="Source/ProcessReflections.cpp"/>
+      <FILE id="au5zm9" name="ProcessReflections.h" compile="0" resource="0"
+            file="Source/ProcessReflections.h"/>
       <FILE id="tZz7hr" name="SharedData.h" compile="0" resource="0" file="Source/SharedData.h"/>
       <FILE id="UXssUG" name="RoomRender.cpp" compile="1" resource="0" file="Source/RoomRender.cpp"/>
       <FILE id="RQg4ht" name="RoomRender.h" compile="0" resource="0" file="Source/RoomRender.h"/>
@@ -38,7 +45,7 @@
   <EXPORTFORMATS>
     <VS2022 targetFolder="Builds/VisualStudio2022">
       <CONFIGURATIONS>
-        <CONFIGURATION isDebug="1" name="Debug" targetName="RoomReverbPlugin"/>
+        <CONFIGURATION isDebug="1" name="Debug" targetName="RoomReverbPlugin" enablePluginBinaryCopyStep="1"/>
         <CONFIGURATION isDebug="0" name="Release" targetName="RoomReverbPlugin"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
