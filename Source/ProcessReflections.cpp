@@ -22,6 +22,7 @@ void ProcessReflections::run()
 
     roomSetup();
     processRoom();
+
 }
 
 void ProcessReflections::roomSetup()
@@ -39,8 +40,8 @@ void ProcessReflections::roomSetup()
 	modelRoom = modelRoom.scaled(roomSize);
 	modelRoom = modelRoom.transpose();
 
-	roomVertices = sharedData.walls;
-	roomVertices.insert(roomVertices.end(), sharedData.floor.begin(), sharedData.floor.end());
+	roomVertices = sharedData.floor;
+	roomVertices.insert(roomVertices.end(), sharedData.walls.begin(), sharedData.walls.end());
 	roomVertices.insert(roomVertices.end(), sharedData.ceiling.begin(), sharedData.ceiling.end());
 
 }
@@ -54,14 +55,13 @@ void ProcessReflections::processRoom()
 	cSVFile.open("data_dump.csv");
 
 	Ray ray;
-	random.setSeed(1000);
+	random.setSeed(1);
 
 	float polar, azimuth;
 	for (int i = 0; i < 2 * POLAR_SUBDIVISIONS; i++) { //azimuth
 		for (int j = 0; j < POLAR_SUBDIVISIONS; j++) { //polar
 			//polar = ((float)M_PI * j) / POLAR_SUBDIVISIONS;
 			//azimuth = ((float)M_PI * i) / POLAR_SUBDIVISIONS;
-			int seed = random.getSeed();
 			polar = (juce::MathConstants<float>::pi / 2) - asin(1 - 2 * random.nextFloat());
 			azimuth = random.nextFloat() * 2.0 * juce::MathConstants<float>::pi;
 			Spherical rayDirectionS(1.0f, azimuth, polar);
@@ -88,7 +88,7 @@ void ProcessReflections::processRoom()
 				float result = FLT_MAX;
 
 				// Traverse triangle list and find the intersecting triangles.
-				const size_t polycountR = roomVertices.size();
+				//const size_t polycountR = roomVertices.size();
 
 				float distance = 0.0f;
 				bool test = false;
@@ -98,6 +98,7 @@ void ProcessReflections::processRoom()
 				juce::Vector3D<float> v0, v1, v2;
 				int index;
 				juce::Vector3D<float>intersect;
+				juce::Vector3D<float> pos;
 				//triMeshRoom->getTriangleVertices(l, &v0, &v1, &v2);
 				for (size_t l = 0; l < 36; l += 3)
 				{
@@ -115,8 +116,6 @@ void ProcessReflections::processRoom()
 					v2.x = roomVertices[index * 6 + 0];
 					v2.y = roomVertices[index * 6 + 1];
 					v2.z = roomVertices[index * 6 + 2];
-
-
 
 					// Transform triangle to world/listener space.
 					jgs::Vector4D<float> v04D = jgs::Vector4D<float>(v0.x, v0.y, v0.z, 1.0f);
@@ -141,27 +140,26 @@ void ProcessReflections::processRoom()
 					test = intersectRayTriangle(ray, triangle, distance, intersect);
 					if (test) {
 						// Keep the result if it's closer than any intersection we've had so far.
-						if (distance > 0.0001f) {
+						//if (distance < result && distance > 0) 
+						if (distance > 1e-4)
+						{
 							result = distance;
+							pos = intersect;
 							rayNormal = ((v1 - v0) ^ (v2 - v0)).normalised();
 						}
 					}
-					//console() << test << ", " << resultP << ", " << distance << endl;
-
 					//cSVFile << i << "," << j << "," << k << ",";
 					//cSVFile << v0.x << "," << v0.y << "," << v0.z << ",";
 					//cSVFile << v1.x << "," << v1.y << "," << v1.z << ",";
 					//cSVFile << v2.x << "," << v2.y << "," << v2.z << ",";
-					//cSVFile << rayNormal.x << "," << rayNormal.y << "," << rayNormal.z << "\n";
-					//cSVFile << test << "," << distance << "\n";
-				}
-				//console() << endl;
+					//cSVFile << rayNormal.x << "," << rayNormal.y << "," << rayNormal.z << "," << test << "\n";
 
+				}
 
 				if (result < FLT_MAX) {
 					rayReflect = reflect(ray.direction.normalised(), rayNormal);
 
-					juce::Vector3D<float> pos = intersect;
+					//juce::Vector3D<float> pos = intersect;
 					rayVectors[i][j][k][0] = pos;
 					rayVectors[i][j][k][1] = rayReflect;
 
