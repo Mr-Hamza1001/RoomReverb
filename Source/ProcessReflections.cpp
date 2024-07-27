@@ -25,6 +25,12 @@ void ProcessReflections::run()
 
 }
 
+ProcessReflections::~ProcessReflections()
+{
+	//delete[] rayVectors, listenerVectors, listenerDistances, floatListenerArray;
+	//delete[] rayVectors2, listenerVectors2, listenerDistances2, floatListenerArray2;
+}
+
 void ProcessReflections::roomSetup()
 {
     auto& sharedData = SharedDataSingleton::getInstance();
@@ -52,6 +58,7 @@ void ProcessReflections::roomSetup()
 	boxVertices.insert(boxVertices.end(), sharedData.ceiling.begin(), sharedData.ceiling.end());
 
 	speedOfSound = sharedData.speedOfSound;
+	additionalRays = sharedData.additionalRays;
 }
 
 void ProcessReflections::processRoom()
@@ -65,6 +72,9 @@ void ProcessReflections::processRoom()
 	Ray ray;
 	random.setSeed(1);
 
+	/***************************************************************/
+	//Pass 1
+	/***************************************************************/
 	float polar, azimuth;
 	juce::Vector3D<float> zeroVector = juce::Vector3D<float>(0.0f, 0.0f, 0.0f);
 	for (int i = 0; i < 2 * POLAR_SUBDIVISIONS; i++) { //azimuth
@@ -297,6 +307,35 @@ void ProcessReflections::processRoom()
 		}
 	}
 
+	/***************************************************************/
+	//Pass 2
+	/***************************************************************/
+	juce::Vector3D<float> originalDirection;
+	random2.setSeed(2);
+	for (int i = 0; i < count; i++)
+	{
+		//Get original ray direction
+		originalDirection = rayVectors[(int)floatListenerArray[i][1]][(int)floatListenerArray[i][2]][0][1];
+		//Convert to Spherical coordinates
+		Cartesian origDirC(originalDirection.x, originalDirection.y, originalDirection.z);
+		Spherical origDirS = origDirC.car_to_sph();
+		for (int j = 0; j < additionalRays; j++)
+		{
+			//Calculate distribution range from original number of rays
+			polar = origDirS.get_phi() + (asin(1 - 2 * random2.nextFloat())) / POLAR_SUBDIVISIONS;
+			azimuth = origDirS.get_theta() + (2 * juce::MathConstants<float>::pi * (0.5f - random2.nextFloat())) / (2 * POLAR_SUBDIVISIONS);
+			azimuth = fmodf(azimuth, 2 * juce::MathConstants<float>::pi);
+			Spherical rayDirectionS(1.0f, azimuth, polar);
+			Cartesian rayDirectionC = rayDirectionS.sph_to_car();
+			juce::Vector3D<float>rayDirection = juce::Vector3D<float>(rayDirectionC.get_x(), rayDirectionC.get_y(), rayDirectionC.get_z());
+			rayVectors2[i][j][0][0] = soundSourcePos;
+			rayVectors2[i][j][0][1] = rayDirection;
+
+			//cSVFile << i << "," << j << "," << "0" << ",";
+			//cSVFile << rayVectors2[i][j][0][0].x << "," << rayVectors2[i][j][0][0].y << "," << rayVectors2[i][j][0][0].z << ",";
+			//cSVFile << rayVectors2[i][j][0][1].x << "," << rayVectors2[i][j][0][1].y << "," << rayVectors2[i][j][0][1].z << "\n";
+		}
+	}
 
 	//Close CSV file
 	cSVFile.close();

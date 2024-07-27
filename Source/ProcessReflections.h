@@ -27,6 +27,7 @@ class ProcessReflections : public juce::Thread
 {
 public:
     ProcessReflections();
+    ~ProcessReflections();
     void run() override;
     void roomSetup();
     void processRoom();
@@ -54,15 +55,20 @@ private:
 
     std::ofstream cSVFile;
 
-    static const int POLAR_SUBDIVISIONS = 10;
+    static const int POLAR_SUBDIVISIONS = 20;
     static const int NUM_REFLECTIONS = 6;
     juce::Vector3D<float> rayVectors[2 * POLAR_SUBDIVISIONS][POLAR_SUBDIVISIONS][NUM_REFLECTIONS][2];
     juce::Vector3D<float> listenerVectors[2 * POLAR_SUBDIVISIONS][POLAR_SUBDIVISIONS][NUM_REFLECTIONS][2];
     float listenerDistances[2 * POLAR_SUBDIVISIONS][POLAR_SUBDIVISIONS][NUM_REFLECTIONS][1]; //azimuth, polar, reflection count, distance
-    float floatListenerArray[5000][7];
+    float floatListenerArray[50000][7];
+    juce::Vector3D<float> rayVectors2[2 * POLAR_SUBDIVISIONS][POLAR_SUBDIVISIONS][NUM_REFLECTIONS][2];
+    juce::Vector3D<float> listenerVectors2[2 * POLAR_SUBDIVISIONS][POLAR_SUBDIVISIONS][NUM_REFLECTIONS][2];
+    float listenerDistances2[2 * POLAR_SUBDIVISIONS][POLAR_SUBDIVISIONS][NUM_REFLECTIONS][1]; //azimuth, polar, reflection count, distance
+    float floatListenerArray2[50000][7];
 
-    juce::Random random;
+    juce::Random random, random2;
     float speedOfSound;
+    int additionalRays;
 
     bool intersectRayTriangle(const Ray& ray, const Triangle& triangle, float& t, juce::Vector3D<float>& intersectionPoint);
     juce::Vector3D<float> reflect(juce::Vector3D<float> line, juce::Vector3D<float> normal);

@@ -93,6 +93,7 @@ void RoomRender::initialise()
     camera.lastY = height / 2;
 
     sharedData.speedOfSound = 346.0f;
+    sharedData.additionalRays = 10;
 
     //Add shapes
     shape->addShapes(sharedData.walls, sharedData.floor, sharedData.ceiling, roomSize);

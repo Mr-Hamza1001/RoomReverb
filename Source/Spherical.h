@@ -69,7 +69,8 @@ Spherical Cartesian::car_to_sph() {
 Cartesian Spherical::sph_to_car() {
 	Cartesian temp;
 
-	mtheta = fmodf(mtheta, 2*juce::MathConstants<float>::pi);
+	mtheta -= juce::MathConstants<float>::pi;
+	mtheta = fmodf(mtheta, juce::MathConstants<float>::pi);
 	mphi = fmodf(mphi, juce::MathConstants<float>::pi);
 
 	temp.get_x() = mr * cos(mtheta) * sin(mphi);
