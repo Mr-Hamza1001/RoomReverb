@@ -27,8 +27,6 @@ void ProcessReflections::run()
 
 ProcessReflections::~ProcessReflections()
 {
-	//delete[] rayVectors, listenerVectors, listenerDistances, floatListenerArray;
-	//delete[] rayVectors2, listenerVectors2, listenerDistances2, floatListenerArray2;
 }
 
 void ProcessReflections::roomSetup()
@@ -296,11 +294,14 @@ void ProcessReflections::processRoom()
 					floatListenerArray[count][1] = i;
 					floatListenerArray[count][2] = j;
 					floatListenerArray[count][3] = k;
-					floatListenerArray[count][4] = listenerDistances[i][j][k][0] * 1000.0f / speedOfSound;
+					floatListenerArray[count][4] = listenerDistances[i][j][k][0] * 1000.0f / speedOfSound; //convert to time delay
 					Cartesian dirC(listenerVectors[i][j][k][1].x, -listenerVectors[i][j][k][1].z, -listenerVectors[i][j][k][1].y);
 					Spherical dirS = dirC.car_to_sph();
 					floatListenerArray[count][5] = dirS.get_theta();
 					floatListenerArray[count][6] = dirS.get_phi();
+
+					cSVFile << i << "," << j << "," << k << ",";
+					cSVFile << floatListenerArray[count][4] << "," << floatListenerArray[count][5] << "," << floatListenerArray[count][6] << "\n";
 					count++;
 				}
 			}
@@ -334,6 +335,220 @@ void ProcessReflections::processRoom()
 			//cSVFile << i << "," << j << "," << "0" << ",";
 			//cSVFile << rayVectors2[i][j][0][0].x << "," << rayVectors2[i][j][0][0].y << "," << rayVectors2[i][j][0][0].z << ",";
 			//cSVFile << rayVectors2[i][j][0][1].x << "," << rayVectors2[i][j][0][1].y << "," << rayVectors2[i][j][0][1].z << "\n";
+		}
+	}
+
+	for (int i = 0; i < count; i++) { //azimuth
+		for (int j = 0; j < additionalRays; j++) { //polar
+			for (int k = 1; k < NUM_REFLECTIONS; k++) {
+				ray.origin = rayVectors2[i][j][k - 1][0];
+				ray.direction = rayVectors2[i][j][k - 1][1];
+
+				//Perform ray cast with listener box
+				// Set initial distance to something far, far away.
+				float result = FLT_MAX;
+
+				// Traverse triangle list and find the intersecting triangles.
+				float distance = 0.0f;
+				bool test = false;
+				rayNormal = zeroVector;
+				rayReflect = zeroVector;
+
+				juce::Vector3D<float> v0, v1, v2;
+				int index;
+				juce::Vector3D<float>intersect;
+				juce::Vector3D<float> pos;
+				//Build and transform triangle vertices
+				for (size_t l = 0; l < 36; l += 3)
+				{
+					index = boxIndices[l + 0];
+					v0.x = boxVertices[index * 6 + 0];
+					v0.y = boxVertices[index * 6 + 1];
+					v0.z = boxVertices[index * 6 + 2];
+
+					index = boxIndices[l + 1];
+					v1.x = boxVertices[index * 6 + 0];
+					v1.y = boxVertices[index * 6 + 1];
+					v1.z = boxVertices[index * 6 + 2];
+
+					index = boxIndices[l + 2];
+					v2.x = boxVertices[index * 6 + 0];
+					v2.y = boxVertices[index * 6 + 1];
+					v2.z = boxVertices[index * 6 + 2];
+
+					// Transform triangle to world/listener space.
+					transformVector(v0, modelListener);
+					transformVector(v1, modelListener);
+					transformVector(v2, modelListener);
+
+					Triangle triangle;
+					triangle.v0 = v0;
+					triangle.v1 = v1;
+					triangle.v2 = v2;
+
+
+					//Test to see if the ray intersects this triangle.
+					test = intersectRayTriangle(ray, triangle, distance, intersect);
+					if (test) {
+						// Keep the result if it's closer than any intersection we've had so far.
+						if (distance > 1e-4)
+						{
+							result = distance;
+							pos = intersect;
+							//rayNormal = ((v1 - v0) ^ (v2 - v0)).normalised();
+						}
+					}
+
+				}
+
+				if (result < FLT_MAX) {
+					//Store listener intersection data
+					listenerVectors2[i][j][k][0] = pos;
+					listenerVectors2[i][j][k][1] = ray.direction.normalised();
+
+					//cSVFile << i << "," << j << "," << k << ",";
+					//cSVFile << listenerVectors[i][j][k][0].x << "," << listenerVectors[i][j][k][0].y << "," << listenerVectors[i][j][k][0].z << ",";
+					//cSVFile << listenerVectors[i][j][k][1].x << "," << listenerVectors[i][j][k][1].y << "," << listenerVectors[i][j][k][1].z << "\n";
+				}
+				else
+				{
+					listenerVectors2[i][j][k][0] = zeroVector;
+					listenerVectors2[i][j][k][1] = zeroVector;
+				}
+
+				//Perform ray cast with the room
+				// Set initial distance to something far, far away.
+				result = FLT_MAX;
+
+				// Traverse triangle list and find the intersecting triangles.
+				distance = 0.0f;
+				test = false;
+				rayNormal = zeroVector;
+				rayReflect = zeroVector;
+
+				for (size_t l = 0; l < 36; l += 3)
+				{
+					index = boxIndices[l + 0];
+					v0.x = boxVertices[index * 6 + 0];
+					v0.y = boxVertices[index * 6 + 1];
+					v0.z = boxVertices[index * 6 + 2];
+
+					index = boxIndices[l + 1];
+					v1.x = boxVertices[index * 6 + 0];
+					v1.y = boxVertices[index * 6 + 1];
+					v1.z = boxVertices[index * 6 + 2];
+
+					index = boxIndices[l + 2];
+					v2.x = boxVertices[index * 6 + 0];
+					v2.y = boxVertices[index * 6 + 1];
+					v2.z = boxVertices[index * 6 + 2];
+
+					// Transform triangle to world/listener space.
+					transformVector(v0, modelRoom);
+					transformVector(v1, modelRoom);
+					transformVector(v2, modelRoom);
+
+					Triangle triangle;
+					triangle.v0 = v0;
+					triangle.v1 = v1;
+					triangle.v2 = v2;
+
+
+					//Test to see if the ray intersects this triangle.
+					test = intersectRayTriangle(ray, triangle, distance, intersect);
+					if (test) {
+						// Keep the result if it's closer than any intersection we've had so far.
+						if (distance > 1e-4)
+						{
+							result = distance;
+							pos = intersect;
+							rayNormal = ((v1 - v0) ^ (v2 - v0)).normalised();
+						}
+					}
+
+				}
+
+				if (result < FLT_MAX) {
+					rayReflect = reflect(ray.direction.normalised(), rayNormal);
+
+					//juce::Vector3D<float> pos = intersect;
+					rayVectors2[i][j][k][0] = pos;
+					rayVectors2[i][j][k][1] = rayReflect;
+
+				}
+				//console() << resultP << ", " << rayNormal << endl;
+
+				//cSVFile << i << "," << j << "," << k << ",";
+				//cSVFile << rayVectors2[i][j][k][0].x << "," << rayVectors2[i][j][k][0].y << "," << rayVectors2[i][j][k][0].z << ",";
+				//cSVFile << rayVectors2[i][j][k][1].x << "," << rayVectors2[i][j][k][1].y << "," << rayVectors2[i][j][k][1].z << "\n";
+				//cSVFile << rayNormal.x << "," << rayNormal.y << "," << rayNormal.z << "\n";
+			}
+		}
+	}
+
+	//Calculate distances ray has travelled and number of reflections when it hits the listener box to get impulse response
+	//Check to see if any reflections pass through sphere during entire path
+	accDistance = 0.0;
+	listenerDistance = 0.0;
+	bReflectionCaught = false;
+	//juce::Vector3D<float> vd;
+	for (int i = 0; i < 2 * count; i++) //azimuth
+	{
+		for (int j = 0; j < additionalRays; j++) //polar
+		{
+			bReflectionCaught = false;
+			for (int k = 0; k < NUM_REFLECTIONS; k++)
+			{
+				listenerDistances2[i][j][k][0] = 0.0f; //zero out value to start with
+				if (listenerVectors2[i][j][k][0].x != 0.0f && listenerVectors2[i][j][k][0].y != 0.0f && listenerVectors2[i][j][k][0].z != 0.0f)
+				{
+					bReflectionCaught = true;
+				}
+			}
+
+			if (bReflectionCaught) {
+				//Add up distances, and if present, add to distance array
+				accDistance = 0.0;
+				for (int k = 0; k < NUM_REFLECTIONS - 1; k++)
+				{
+					if (listenerVectors2[i][j][k][0].x != 0.0f && listenerVectors2[i][j][k][0].y != 0.0f && listenerVectors2[i][j][k][0].z != 0.0f)
+					{
+						vd = listenerVectors2[i][j][k][0] - rayVectors2[i][j][k][0];
+						listenerDistance = vd.length();
+						listenerDistances2[i][j][k][0] = accDistance + listenerDistance;
+					}
+					vd = rayVectors2[i][j][k + 1][0] - rayVectors2[i][j][k][0];
+					accDistance += vd.length();
+				}
+			}
+		}
+	}
+
+	//Determine contents of listener array, populated with delay time (ms) and attenuation
+	int count2 = 0;
+	for (int i = 0; i < 2 * count; i++)
+	{
+		for (int j = 0; j < additionalRays; j++)
+		{
+			for (int k = 0; k < NUM_REFLECTIONS; k++)
+			{
+				if (listenerVectors2[i][j][k][0].x != 0.0f && listenerVectors2[i][j][k][0].y != 0.0f && listenerVectors2[i][j][k][0].z != 0.0f)
+				{
+					floatListenerArray2[count2][0] = 0;
+					floatListenerArray2[count2][1] = i;
+					floatListenerArray2[count2][2] = j;
+					floatListenerArray2[count2][3] = k;
+					floatListenerArray2[count2][4] = listenerDistances2[i][j][k][0] * 1000.0f / speedOfSound;
+					Cartesian dirC(listenerVectors2[i][j][k][1].x, -listenerVectors2[i][j][k][1].z, -listenerVectors2[i][j][k][1].y);
+					Spherical dirS = dirC.car_to_sph();
+					floatListenerArray2[count2][5] = dirS.get_theta();
+					floatListenerArray2[count2][6] = dirS.get_phi();
+
+					//cSVFile << i << "," << j << "," << k << ",";
+					//cSVFile << floatListenerArray2[count2][4] << "," << floatListenerArray2[count2][5] << "," << floatListenerArray2[count2][6] << "\n";
+					count2++;
+				}
+			}
 		}
 	}
 
