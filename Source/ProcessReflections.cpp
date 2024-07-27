@@ -11,6 +11,9 @@
 #include "ProcessReflections.h"
 #include "Spherical.h"
 #include "SharedData.h"
+#include <iostream>
+#include <vector>
+#include <algorithm>
 
 ProcessReflections::ProcessReflections() : juce::Thread("ProcessReflections") {}
 
@@ -551,6 +554,24 @@ void ProcessReflections::processRoom()
 			}
 		}
 	}
+
+	//Generate impulse response from combined listener arrays
+	//Copy arrays to a vector
+	std::vector<std::vector<float>> listenerVector1, listenerVector2;
+	//Copy first array
+	for (size_t i = 0; i < sizeof(floatListenerArray) / sizeof(floatListenerArray[0]); ++i) 
+	{
+		listenerVector1.push_back(std::vector<float>(floatListenerArray[i], floatListenerArray[i] + sizeof(floatListenerArray[i]) / sizeof(float)));
+	}
+
+	//Copy second array
+	for (size_t i = 0; i < sizeof(floatListenerArray2) / sizeof(floatListenerArray2[0]); ++i) 
+	{
+		listenerVector2.push_back(std::vector<float>(floatListenerArray2[i], floatListenerArray2[i] + sizeof(floatListenerArray2[i]) / sizeof(float)));
+	}
+
+	listenerVector1.resize(count);
+	listenerVector2.resize(count2);
 
 	//Close CSV file
 	cSVFile.close();
