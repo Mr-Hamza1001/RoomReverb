@@ -159,8 +159,8 @@ void ProcessReflections::processRoom()
 
 				if (result < FLT_MAX) {
 					//Store listener intersection data
-					listenerVectors[i][j][k][0] = pos;
-					listenerVectors[i][j][k][1] = ray.direction.normalised();
+					listenerVectors[i][j][k-1][0] = pos;
+					listenerVectors[i][j][k-1][1] = ray.direction.normalised();
 
 					//cSVFile << i << "," << j << "," << k << ",";
 					//cSVFile << listenerVectors[i][j][k][0].x << "," << listenerVectors[i][j][k][0].y << "," << listenerVectors[i][j][k][0].z << ",";
@@ -168,8 +168,8 @@ void ProcessReflections::processRoom()
 				}
 				else
 				{
-					listenerVectors[i][j][k][0] = zeroVector;
-					listenerVectors[i][j][k][1] = zeroVector;
+					listenerVectors[i][j][k-1][0] = zeroVector;
+					listenerVectors[i][j][k-1][1] = zeroVector;
 				}
 
 				//Perform ray cast with the room
@@ -273,7 +273,7 @@ void ProcessReflections::processRoom()
 						listenerDistance = vd.length();
 						listenerDistances[i][j][k][0] = accDistance + listenerDistance;
 					}
-					vd = rayVectors[i][j][k + 1][0] - rayVectors[i][j][k][0];
+					vd = rayVectors[i][j][k][0] - rayVectors[i][j][k + 1][0];
 					accDistance += vd.length();
 				}
 			}
@@ -294,7 +294,7 @@ void ProcessReflections::processRoom()
 					floatListenerArray[count][1] = i;
 					floatListenerArray[count][2] = j;
 					floatListenerArray[count][3] = k;
-					floatListenerArray[count][4] = listenerDistances[i][j][k][0] * 1000.0f / speedOfSound; //convert to time delay
+					floatListenerArray[count][4] = listenerDistances[i][j][k][0] *1000.0f / speedOfSound; //convert to time delay
 					Cartesian dirC(listenerVectors[i][j][k][1].x, -listenerVectors[i][j][k][1].z, -listenerVectors[i][j][k][1].y);
 					Spherical dirS = dirC.car_to_sph();
 					floatListenerArray[count][5] = dirS.get_theta();
@@ -403,8 +403,8 @@ void ProcessReflections::processRoom()
 
 				if (result < FLT_MAX) {
 					//Store listener intersection data
-					listenerVectors2[i][j][k][0] = pos;
-					listenerVectors2[i][j][k][1] = ray.direction.normalised();
+					listenerVectors2[i][j][k-1][0] = pos;
+					listenerVectors2[i][j][k-1][1] = ray.direction.normalised();
 
 					//cSVFile << i << "," << j << "," << k << ",";
 					//cSVFile << listenerVectors[i][j][k][0].x << "," << listenerVectors[i][j][k][0].y << "," << listenerVectors[i][j][k][0].z << ",";
@@ -412,8 +412,8 @@ void ProcessReflections::processRoom()
 				}
 				else
 				{
-					listenerVectors2[i][j][k][0] = zeroVector;
-					listenerVectors2[i][j][k][1] = zeroVector;
+					listenerVectors2[i][j][k-1][0] = zeroVector;
+					listenerVectors2[i][j][k-1][1] = zeroVector;
 				}
 
 				//Perform ray cast with the room
@@ -492,7 +492,7 @@ void ProcessReflections::processRoom()
 	listenerDistance = 0.0;
 	bReflectionCaught = false;
 	//juce::Vector3D<float> vd;
-	for (int i = 0; i < 2 * count; i++) //azimuth
+	for (int i = 0; i < count; i++) //azimuth
 	{
 		for (int j = 0; j < additionalRays; j++) //polar
 		{
@@ -517,7 +517,7 @@ void ProcessReflections::processRoom()
 						listenerDistance = vd.length();
 						listenerDistances2[i][j][k][0] = accDistance + listenerDistance;
 					}
-					vd = rayVectors2[i][j][k + 1][0] - rayVectors2[i][j][k][0];
+					vd = rayVectors2[i][j][k][0] - rayVectors2[i][j][k + 1][0];
 					accDistance += vd.length();
 				}
 			}
@@ -526,7 +526,7 @@ void ProcessReflections::processRoom()
 
 	//Determine contents of listener array, populated with delay time (ms) and attenuation
 	int count2 = 0;
-	for (int i = 0; i < 2 * count; i++)
+	for (int i = 0; i < count; i++)
 	{
 		for (int j = 0; j < additionalRays; j++)
 		{
@@ -538,14 +538,14 @@ void ProcessReflections::processRoom()
 					floatListenerArray2[count2][1] = i;
 					floatListenerArray2[count2][2] = j;
 					floatListenerArray2[count2][3] = k;
-					floatListenerArray2[count2][4] = listenerDistances2[i][j][k][0] * 1000.0f / speedOfSound;
+					floatListenerArray2[count2][4] = listenerDistances2[i][j][k][0] *1000.0f / speedOfSound;
 					Cartesian dirC(listenerVectors2[i][j][k][1].x, -listenerVectors2[i][j][k][1].z, -listenerVectors2[i][j][k][1].y);
 					Spherical dirS = dirC.car_to_sph();
 					floatListenerArray2[count2][5] = dirS.get_theta();
 					floatListenerArray2[count2][6] = dirS.get_phi();
 
-					//cSVFile << i << "," << j << "," << k << ",";
-					//cSVFile << floatListenerArray2[count2][4] << "," << floatListenerArray2[count2][5] << "," << floatListenerArray2[count2][6] << "\n";
+					cSVFile << i << "," << j << "," << k << ",";
+					cSVFile << floatListenerArray2[count2][4] << "," << floatListenerArray2[count2][5] << "," << floatListenerArray2[count2][6] << "\n";
 					count2++;
 				}
 			}
