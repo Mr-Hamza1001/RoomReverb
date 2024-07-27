@@ -54,13 +54,14 @@ public:
 
 Spherical Cartesian::car_to_sph() {
 	Spherical temp;
+	float r, theta, phi;
 
 	temp.get_r() = (float)sqrt(pow(mx, 2) + pow(my, 2) + pow(mz, 2));
-	temp.get_theta() = atan2(my, mx);
-	temp.get_phi() = acos(mz / temp.get_r());
+	theta = atan2(my, mx) + juce::MathConstants<float>::pi;
+	phi = acos(mz / temp.get_r());
 
-	//temp.get_theta() = fmodf(temp.get_theta(), 2 * (float)M_PI);
-	//temp.get_phi() = fmodf(temp.get_phi(), (float)M_PI);
+	temp.get_theta() = fmodf(theta, 2 * juce::MathConstants<float>::pi);
+	temp.get_phi() = fmodf(phi, juce::MathConstants<float>::pi);
 
 	return temp;
 }
@@ -68,8 +69,8 @@ Spherical Cartesian::car_to_sph() {
 Cartesian Spherical::sph_to_car() {
 	Cartesian temp;
 
-	mtheta = fmodf(mtheta, 2*(float)juce::MathConstants<float>::pi);
-	mphi = fmodf(mphi, (float)juce::MathConstants<float>::pi);
+	mtheta = fmodf(mtheta, 2*juce::MathConstants<float>::pi);
+	mphi = fmodf(mphi, juce::MathConstants<float>::pi);
 
 	temp.get_x() = mr * cos(mtheta) * sin(mphi);
 	temp.get_y() = mr * sin(mtheta) * sin(mphi);

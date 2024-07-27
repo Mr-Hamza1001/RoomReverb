@@ -30,16 +30,14 @@ public:
     void run() override;
     void roomSetup();
     void processRoom();
-    bool intersectRayTriangle(const Ray& ray, const Triangle& triangle, float& t, juce::Vector3D<float>& intersectionPoint);
-    juce::Vector3D<float> reflect(juce::Vector3D<float> line, juce::Vector3D<float> normal);
 
 private:
-    juce::Vector3D<float> roomPos, roomSize, listenerPos, soundSourcePos;
-    juce::Matrix3D<float> modelRoom;
+    juce::Vector3D<float> roomPos, roomSize, listenerPos, listenerSize, soundSourcePos;
+    juce::Matrix3D<float> modelRoom, modelListener;
     jgs::Vector4D<float> test;
 
-    std::vector<float> roomVertices;
-    unsigned int roomIndices[36] = {  // note that we start from 0!
+    std::vector<float> boxVertices;
+    unsigned int boxIndices[36] = {  // note that we start from 0!
     0, 1, 3,   // first triangle
     1, 2, 3,   // second triangle
     4, 5, 7,   // first triangle
@@ -56,9 +54,17 @@ private:
 
     std::ofstream cSVFile;
 
-    static const int POLAR_SUBDIVISIONS = 4;
-    static const int NUM_REFLECTIONS = 15;
+    static const int POLAR_SUBDIVISIONS = 10;
+    static const int NUM_REFLECTIONS = 6;
     juce::Vector3D<float> rayVectors[2 * POLAR_SUBDIVISIONS][POLAR_SUBDIVISIONS][NUM_REFLECTIONS][2];
     juce::Vector3D<float> listenerVectors[2 * POLAR_SUBDIVISIONS][POLAR_SUBDIVISIONS][NUM_REFLECTIONS][2];
+    float listenerDistances[2 * POLAR_SUBDIVISIONS][POLAR_SUBDIVISIONS][NUM_REFLECTIONS][1]; //azimuth, polar, reflection count, distance
+    float floatListenerArray[5000][7];
+
     juce::Random random;
+    float speedOfSound;
+
+    bool intersectRayTriangle(const Ray& ray, const Triangle& triangle, float& t, juce::Vector3D<float>& intersectionPoint);
+    juce::Vector3D<float> reflect(juce::Vector3D<float> line, juce::Vector3D<float> normal);
+    void transformVector(juce::Vector3D<float>& v, juce::Matrix3D<float> mat);
 };
