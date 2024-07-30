@@ -67,8 +67,8 @@ private:
     float floatListenerArray2[100000][7]{};
 
     juce::Random random, random2;
-    float speedOfSound;
-    int additionalRays;
+    float speedOfSound, rollOff, delayBucketSize;
+    int additionalRays, numberPolarBuckets;
 
     bool intersectRayTriangle(const Ray& ray, const Triangle& triangle, float& t, juce::Vector3D<float>& intersectionPoint);
     juce::Vector3D<float> reflect(juce::Vector3D<float> line, juce::Vector3D<float> normal);

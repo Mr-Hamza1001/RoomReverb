@@ -19,8 +19,8 @@ struct SharedData
     //std::vector<float> someVector;
 
     juce::Vector3D<float> roomSize, roomPos, listenerPos, listenerSize, soundSourcePos;
-    float speedOfSound;
-    int additionalRays;
+    float speedOfSound, rollOff, delayBucketSize;
+    int additionalRays, numberPolarBuckets;
 
     std::vector<float> walls{
         //Position            //Texture    //ID

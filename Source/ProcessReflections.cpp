@@ -8,12 +8,12 @@
   ==============================================================================
 */
 
-#include "ProcessReflections.h"
-#include "Spherical.h"
-#include "SharedData.h"
 #include <iostream>
 #include <vector>
 #include <algorithm>
+#include "ProcessReflections.h"
+#include "Spherical.h"
+#include "SharedData.h"
 
 ProcessReflections::ProcessReflections() : juce::Thread("ProcessReflections") {}
 
@@ -58,8 +58,12 @@ void ProcessReflections::roomSetup()
 	boxVertices.insert(boxVertices.end(), sharedData.walls.begin(), sharedData.walls.end());
 	boxVertices.insert(boxVertices.end(), sharedData.ceiling.begin(), sharedData.ceiling.end());
 
-	speedOfSound = sharedData.speedOfSound;
-	additionalRays = sharedData.additionalRays;
+	sharedData.speedOfSound = speedOfSound = 346.0f;
+	sharedData.additionalRays = additionalRays = 10;
+	sharedData.rollOff = rollOff = 1.0f;
+	sharedData.delayBucketSize = delayBucketSize = 1.0f;
+	sharedData.numberPolarBuckets = numberPolarBuckets = 20;
+
 }
 
 void ProcessReflections::processRoom()
@@ -558,6 +562,7 @@ void ProcessReflections::processRoom()
 	//Generate impulse response from combined listener arrays
 	//Copy arrays to a vector
 	std::vector<std::vector<float>> listenerVector1, listenerVector2;
+	std::vector<float> vec;
 	//Copy first array
 	for (size_t i = 0; i < sizeof(floatListenerArray) / sizeof(floatListenerArray[0]); ++i) 
 	{
@@ -572,6 +577,32 @@ void ProcessReflections::processRoom()
 
 	listenerVector1.resize(count);
 	listenerVector2.resize(count2);
+
+	//Combine vectors into one, passing in the delay, azimuth. polar and attenuation values only
+	std::vector<std::vector<float>> combinedVector;
+	for (int i = 0; i < listenerVector1.size(); i++)
+	{
+		combinedVector.push_back({ ceil(listenerVector1[i][4] / delayBucketSize), 
+			ceil(listenerVector1[i][5] * numberPolarBuckets / juce::MathConstants<float>::pi),
+			ceil(listenerVector1[i][6] * numberPolarBuckets / juce::MathConstants<float>::pi),
+			1.0f / pow(listenerVector1[i][4], rollOff) });
+	}
+	for (int i = 0; i < listenerVector2.size(); i++)
+	{
+		combinedVector.push_back({ ceil(listenerVector2[i][4] / delayBucketSize), 
+			ceil(listenerVector2[i][5] * numberPolarBuckets / juce::MathConstants<float>::pi),
+			ceil(listenerVector2[i][6] * numberPolarBuckets / juce::MathConstants<float>::pi),
+			1.0f / (pow(listenerVector2[i][4], rollOff) * additionalRays) });
+	}
+
+	//Populate an IR and save as a wav file
+	//Sort combined vector by delay, azimuth, then polar buckets
+	std::sort(combinedVector.begin(), combinedVector.end(), [](std::vector<float> const& a, std::vector<float> const& b) {
+	if (a[0] != b[0]) return a[0] < b[0]; // Compare by column delay
+	if (a[1] != b[1]) return a[1] < b[1]; // Compare by column azimuth
+	return a[2] < b[2];                   // Compare by column polar
+		});
+
 
 	//Close CSV file
 	cSVFile.close();
@@ -630,4 +661,13 @@ void ProcessReflections::transformVector(juce::Vector3D<float>& v, juce::Matrix3
 	jgs::Vector4D<float> v4D = jgs::Vector4D<float>(v.x, v.y, v.z, 1.0f);
 	v4D = v4D.transformed(v4D, mat);
 	v = juce::Vector3D<float>(v4D.x, v4D.y, v4D.z);
+}
+
+void abssort(float* x, unsigned n) {
+	std::sort(x, x + n,
+		// Lambda expression begins
+		[](float a, float b) {
+			return (std::abs(a) < std::abs(b));
+		} // end of lambda expression
+	);
 }
