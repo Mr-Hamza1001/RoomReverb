@@ -11,6 +11,7 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
+#include <JuceHeader.h>
 #include "ProcessReflections.h"
 #include "Spherical.h"
 #include "SharedData.h"
@@ -31,13 +32,12 @@ void ProcessReflections::run()
 	pass2();
 	populateIR();
 
+	//Close CSV file
+	cSVFile.close();
 }
 
 ProcessReflections::~ProcessReflections()
 {
-	//Close CSV file
-	cSVFile.close();
-
 }
 
 void ProcessReflections::roomSetup()
@@ -69,7 +69,7 @@ void ProcessReflections::roomSetup()
 	sharedData.speedOfSound = speedOfSound = 346.0f;
 	sharedData.additionalRays = additionalRays = 10;
 	sharedData.rollOff = rollOff = 1.0f;
-	sharedData.delayBucketSize = delayBucketSize = 1.0f;
+	sharedData.delayBucketSize = delayBucketSize = 0.1f;
 	sharedData.numberPolarBuckets = numberPolarBuckets = 20;
 
 }
@@ -599,17 +599,19 @@ void ProcessReflections::populateIR()
 	std::vector<std::vector<float>> combinedVector;
 	for (int i = 0; i < listenerVector1.size(); i++)
 	{
-		combinedVector.push_back({ ceil(listenerVector1[i][4] / delayBucketSize),
+		float delay = ceil(listenerVector1[i][4] * 100.0f) / (delayBucketSize * 100.0f);
+		combinedVector.push_back({ delay,
 			ceil(listenerVector1[i][5] * numberPolarBuckets / juce::MathConstants<float>::pi),
 			ceil(listenerVector1[i][6] * numberPolarBuckets / juce::MathConstants<float>::pi),
-			1.0f / pow(listenerVector1[i][4], rollOff) });
+			1.0f / pow(delay, rollOff) });
 	}
 	for (int i = 0; i < listenerVector2.size(); i++)
 	{
-		combinedVector.push_back({ ceil(listenerVector2[i][4] / delayBucketSize),
+		float delay = ceil(listenerVector2[i][4] * 100.0f) / (delayBucketSize * 100.0f);
+		combinedVector.push_back({ delay,
 			ceil(listenerVector2[i][5] * numberPolarBuckets / juce::MathConstants<float>::pi),
 			ceil(listenerVector2[i][6] * numberPolarBuckets / juce::MathConstants<float>::pi),
-			1.0f / (pow(listenerVector2[i][4], rollOff) * additionalRays) });
+			1.0f / (pow(delay, rollOff) * additionalRays) });
 	}
 
 	//Sort combined vector by delay, azimuth, then polar buckets
@@ -619,7 +621,7 @@ void ProcessReflections::populateIR()
 	return a[2] < b[2];                   // Compare by column polar
 		});
 
-	//Output combined array to CSV file
+	////Output combined array to CSV file
 	//for (int i = 0; i < combinedVector.size(); i++)
 	//{
 	//	cSVFile << combinedVector[i][0] << "," << combinedVector[i][1] << "," << combinedVector[i][2] << "," << combinedVector[i][3] << "\n";
@@ -669,7 +671,41 @@ void ProcessReflections::populateIR()
 		cSVFile << combinedVectorDup[i][0] << "," << combinedVectorDup[i][1] << "," << combinedVectorDup[i][2] << "," << combinedVectorDup[i][3] << "\n";
 	}
 
+	//Output IR to wave file
+	WavAudioFormat wavFormat;
+	File outputFile = File::getCurrentWorkingDirectory().getChildFile("output.wav");
+	if (outputFile.existsAsFile()) outputFile.deleteFile();
+	std::unique_ptr<FileOutputStream> outputStream(outputFile.createOutputStream());
 
+	std::unique_ptr<AudioFormatWriter> writer(wavFormat.createWriterFor(outputStream.get(),
+		44100, // Sample rate
+		1,     // Number of channels
+		16,    // Bits per sample
+		{},    // Metadata
+		0));   // Quality
+
+	if (writer != nullptr)
+	{
+		int bufferSize = (int)((44100.0f * (combinedVectorDup[combinedVectorDup.size() - 1][0] + 1) * delayBucketSize) / 1000.0f);
+		AudioBuffer<float> buffer(1, bufferSize);
+		buffer.clear();
+
+		// Fill the buffer with your audio data
+		for (int channel = 0; channel < buffer.getNumChannels(); ++channel)
+		{
+			for (int sampleIR = 0; sampleIR < combinedVectorDup.size(); ++sampleIR)
+			{
+				int samplePos = (int)(combinedVectorDup[sampleIR][0] * 44.1 * delayBucketSize);
+				float sampleData = combinedVectorDup[sampleIR][3];
+				buffer.setSample(channel, samplePos, sampleData);
+			}
+		}
+
+		writer->writeFromAudioSampleBuffer(buffer, 0, buffer.getNumSamples());
+		writer->flush();
+	}
+
+	outputStream.release();
 }
 
 bool ProcessReflections::intersectRayTriangle(const Ray& ray, const Triangle& triangle, float& t, juce::Vector3D<float>& intersectionPoint)

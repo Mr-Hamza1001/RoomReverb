@@ -77,12 +77,12 @@ void RoomRender::initialise()
 
     auto& sharedData = SharedDataSingleton::getInstance();
     std::lock_guard<std::mutex> lock(sharedData.vectorMutex);
-    roomSize = juce::Vector3D<float>(5.0f, 5.0f, 5.0f);
+    roomSize = juce::Vector3D<float>(30.0f, 30.0f, 30.0f);
     sharedData.roomSize = roomSize;
-    sharedData.soundSourcePos = juce::Vector3D<float>(2.5f, 2.0f, 3.0f);
+    sharedData.soundSourcePos = juce::Vector3D<float>(18.0f, 18.0f, 18.0f);
 
     //shape->roomSize = roomSize;
-    cameraPos = Vector3D<float>(1.0f, 1.0f, 1.0f);
+    cameraPos = Vector3D<float>(2.0f, 2.0f, 2.0f);
     sharedData.listenerPos = cameraPos;
 
     //Make the listener box scale with the room to help manage the processing overhead
