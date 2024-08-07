@@ -23,11 +23,10 @@
 
   ==============================================================================
 */
-#include <JuceHeader.h>
-#include "jgs_Vector4D.h"
 
-namespace jgs
+namespace juce
 {
+
 //==============================================================================
 /**
     A 4x4 3D transformation matrix.
@@ -90,7 +89,7 @@ public:
     }
 
     /** Creates a matrix from a 3D vector translation. */
-    Matrix3D (juce::Vector3D<Type> vector) noexcept
+    Matrix3D (Vector3D<Type> vector) noexcept
     {
         mat[0]  = Type (1); mat[1]  = 0;        mat[2]  = 0;         mat[3]  = 0;
         mat[4]  = 0;        mat[5]  = Type (1); mat[6]  = 0;         mat[7]  = 0;
@@ -99,7 +98,7 @@ public:
     }
 
     /** Creates a matrix from a 3D vector translation. */
-    static Matrix3D fromTranslation(juce::Vector3D<Type> vector) noexcept
+    static Matrix3D fromTranslation(Vector3D<Type> vector) noexcept
     {
         return { Type(1), 0,        0,        0,
                  0,        Type(1), 0,        0,
@@ -154,10 +153,10 @@ public:
     }
 
     /** Returns a new look-at matrix from the provided vectors. */
-    static Matrix3D fromLookAt (juce::Vector3D<Type> eye, juce::Vector3D<Type> center, juce::Vector3D<Type> up) noexcept
+    static Matrix3D fromLookAt (Vector3D<Type> eye, Vector3D<Type> center, Vector3D<Type> up) noexcept
     {
-        const auto f = juce::Vector3D<Type> (center - eye).normalised();
-        const auto s = juce::Vector3D<Type> (f ^ up).normalised();
+        const auto f = Vector3D<Type> (center - eye).normalised();
+        const auto s = Vector3D<Type> (f ^ up).normalised();
         const auto u = s ^ f;
 
         //return { s.x, s.y, s.z, 0,
@@ -171,7 +170,7 @@ public:
     }
 
     /** Returns a matrix which will apply a rotation through the X, Y, and Z angles specified by a vector. */
-    static Matrix3D rotation (juce::Vector3D<Type> eulerAngleRadians) noexcept
+    static Matrix3D rotation (Vector3D<Type> eulerAngleRadians) noexcept
     {
         auto cx = std::cos (eulerAngleRadians.x), sx = std::sin (eulerAngleRadians.x),
              cy = std::cos (eulerAngleRadians.y), sy = std::sin (eulerAngleRadians.y),
@@ -184,19 +183,19 @@ public:
     }
 
     /** Returns a version of this matrix rotated by the provided vector. */
-    Matrix3D rotated (juce::Vector3D<Type> eulerAngleRadians) noexcept
+    Matrix3D rotated (Vector3D<Type> eulerAngleRadians) noexcept
     {
         return *this * rotation (eulerAngleRadians);
     }
 
     /** Rotates this matrix by the provided vector. */
-    void rotate (juce::Vector3D<Type> eulerAngleRadians) noexcept
+    void rotate (Vector3D<Type> eulerAngleRadians) noexcept
     {
         *this = rotated (scalar);
     }
 
     /** Returns a matrix which will apply a scale specified by a vector. */
-    Matrix3D scaled (juce::Vector3D<Type> scalar) noexcept
+    Matrix3D scaled (Vector3D<Type> scalar) noexcept
     {
         return { mat[0] * scalar.x, mat[1] * scalar.x, mat[2] * scalar.x, mat[3] * scalar.x,
                  mat[4] * scalar.y, mat[5] * scalar.y, mat[6] * scalar.y, mat[7] * scalar.y,
@@ -211,20 +210,32 @@ public:
     }
 
     /** Returns a translation matrix. */
-    static Matrix3D translation (juce::Vector3D<Type> delta) noexcept
+    static Matrix3D translation(Vector3D<Type> delta) noexcept
     {
         //return { Type(1), 0, 0, delta.x,
         //         0, Type(1), 0, delta.y,
         //         0, 0, Type(1), delta.z,
         //         0, 0, 0, Type(1) };
+        return { Type(1), 0, 0, 0,
+                 0, Type(1), 0, 0,
+                 0, 0, Type(1), 0,
+                 delta.x, delta.y, delta.z, Type(1) };
+    }
+
+    static Matrix3D translation2(Vector3D<Type> delta) noexcept
+    {
         return { Type(1), 0, 0, delta.x,
                  0, Type(1), 0, delta.y,
                  0, 0, Type(1), delta.z,
                  0, 0, 0, Type(1) };
+        //return { Type(1), 0, 0, 0,
+        //         0, Type(1), 0, 0,
+        //         0, 0, Type(1), 0,
+        //         delta.x, delta.y, delta.z, Type(1) };
     }
 
     /** Returns a matrix which will apply a translation specified by the provided vector. */
-    Matrix3D translated (juce::Vector3D<Type> delta) noexcept
+    Matrix3D translated (Vector3D<Type> delta) noexcept
     {
         return { mat[0], mat[1], mat[2], mat[2] * delta.x,
                  mat[5], mat[6], mat[7], mat[2] * delta.y,
@@ -233,7 +244,7 @@ public:
     }
 
     /** Translates this matrix by the provided vector. */
-    void translate (juce::Vector3D<Type> delta) noexcept
+    void translate (Vector3D<Type> delta) noexcept
     {
         *this = translated (delta);
     }
@@ -269,6 +280,16 @@ public:
 
     /** The 4x4 matrix values. These are stored in the standard OpenGL order. */
     Type mat[16];
+
+    /** Returns a matrix which will apply a translation specified by the provided vector. */
+    Matrix3D transpose() noexcept
+    {
+        return { mat[0], mat[4], mat[8], mat[12],
+                 mat[1], mat[5], mat[9], mat[13],
+                 mat[2], mat[6], mat[10], mat[14],
+                 mat[3], mat[7], mat[11], mat[15] };
+    }
+
 
 };
 

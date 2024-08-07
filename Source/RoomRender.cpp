@@ -10,6 +10,7 @@
 
 #include <JuceHeader.h>
 #include "RoomRender.h"
+#include "ExMatrix3D.h"
 
 //==============================================================================
 RoomRender::RoomRender()
@@ -146,16 +147,16 @@ void RoomRender::render()
     shader->use();
 
     Matrix3D<float> projection;
-    projection = Matrix3D<float>::fromPerspective(degreesToRadians(camera.Zoom), (width / height), 0.1f, 100.0f);
+    projection = ExMatrix3D<float>::fromPerspective(degreesToRadians(camera.Zoom), (width / height), 0.1f, 100.0f);
     if (uniforms->projection.get() != nullptr)
         uniforms->projection->setMatrix4(projection.mat, 1, false);
 
     Matrix3D<float> view;
-    view = Matrix3D<float>::fromLookAt(camera.Position, camera.Position + camera.Front, camera.Up);
+    view = ExMatrix3D<float>::fromLookAt(camera.Position, camera.Position + camera.Front, camera.Up);
     if (uniforms->view.get() != nullptr)
         uniforms->view->setMatrix4(view.mat, 1, false);
 
-    Matrix3D<float> model;
+    ExMatrix3D<float> model;
     model = model.translation(roomPos);
     model = model.scaled(roomSize);
     if (uniforms->model.get() != nullptr)

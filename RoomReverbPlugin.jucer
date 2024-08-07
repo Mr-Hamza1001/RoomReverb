@@ -4,7 +4,7 @@
               addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1">
   <MAINGROUP id="uOv3RL" name="RoomReverbPlugin">
     <GROUP id="{48374C04-3712-628F-ADF6-7BB869E12AC2}" name="Source">
-      <FILE id="DXo9Jt" name="jgs_Matrix3D.h" compile="0" resource="0" file="Source/jgs_Matrix3D.h"/>
+      <FILE id="FpFWDc" name="ExMatrix3D.h" compile="0" resource="0" file="Source/ExMatrix3D.h"/>
       <FILE id="MKza8c" name="jgs_Vector4D.h" compile="0" resource="0" file="Source/jgs_Vector4D.h"/>
       <FILE id="DeogE4" name="Spherical.h" compile="0" resource="0" file="Source/Spherical.h"/>
       <FILE id="Ky5HPT" name="ProcessReflections.cpp" compile="1" resource="0"

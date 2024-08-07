@@ -12,6 +12,7 @@
 #include <iostream>
 #include <fstream>
 #include "jgs_Vector4D.h"
+#include "ExMatrix3D.h"
 #include <JuceHeader.h>
 #include <juce_core/juce_core.h>
 
@@ -30,12 +31,14 @@ public:
     ~ProcessReflections();
     void run() override;
     void roomSetup();
-    void processRoom();
+    void pass1();
+    void pass2();
+    void populateIR();
 
 private:
     juce::Vector3D<float> roomPos, roomSize, listenerPos, listenerSize, soundSourcePos;
-    juce::Matrix3D<float> modelRoom, modelListener;
-    jgs::Vector4D<float> test;
+    ExMatrix3D<float> modelRoom, modelListener;
+    int count, count2;
 
     std::vector<float> boxVertices;
     unsigned int boxIndices[36] = {  // note that we start from 0!

@@ -3,6 +3,8 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 
+#include "ExMatrix3D.h"
+
 static float radiansToDegrees(float rads) noexcept { return (180.0f / juce::MathConstants<float>::pi) * rads; }
 static float degreesToRadians(float degs) noexcept { return (juce::MathConstants<float>::pi / 180.0f) * degs; }
 
@@ -64,7 +66,7 @@ public:
     // returns the view matrix calculated using Euler Angles and the LookAt Matrix
     Matrix3D<float> GetViewMatrix()
     {
-        return Matrix3D<float>::fromLookAt(Position, Position + Front, Up);
+        return ExMatrix3D<float>::fromLookAt(Position, Position + Front, Up);
     }
 
     // processes input received from any keyboard-like input system. Accepts input parameter in the form of camera defined ENUM (to abstract it from windowing systems)
