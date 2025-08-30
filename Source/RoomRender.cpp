@@ -1,12 +1,16 @@
 /*
-  ==============================================================================
-
-    RoomRender.cpp
-    Created: 21 Jul 2024 11:24:14am
-    Author:  jstan
-
-  ==============================================================================
-*/
+ * Copyright (c) 2025 James G. Stanier
+ *
+ * This file is part of RoomReverbPlugin.
+ *
+ * This software is dual-licensed under:
+ *   1. The GNU General Public License v3.0 (GPLv3)
+ *   2. A commercial license (contact j.stanier766(at)gmail.com for details)
+ *
+ * You may use this file under the terms of the GPLv3 as published by
+ * the Free Software Foundation. For proprietary/commercial use,
+ * please see the LICENSE-COMMERCIAL file or contact the copyright holder.
+ */
 
 #include <JuceHeader.h>
 #include "RoomRender.h"
@@ -36,45 +40,6 @@ void RoomRender::initialise()
     // Initialize OpenGL resources here
     createShaders();
 
-    //std::vector<float> walls{
-    //    //Position            //Texture                //ID
-    //    -0.5f, -0.5f, -0.5f,  0.0f,       0.0f,        0.0f,
-    //     0.5f, -0.5f, -0.5f,  roomSize.x, 0.0f,        0.0f,
-    //     0.5f,  0.5f, -0.5f,  roomSize.x, roomSize.y,  0.0f,
-    //    -0.5f,  0.5f, -0.5f,  0.0f,       roomSize.y,  0.0f,
-
-    //    -0.5f, -0.5f,  0.5f,  0.0f,       0.0f,        0.0f,
-    //     0.5f, -0.5f,  0.5f,  roomSize.x, 0.0f,        0.0f,
-    //     0.5f,  0.5f,  0.5f,  roomSize.x, roomSize.y,  0.0f,
-    //    -0.5f,  0.5f,  0.5f,  0.0f,       roomSize.y,  0.0f,
-
-    //    -0.5f,  0.5f,  0.5f,  0.0f,       0.0f,        0.0f,
-    //    -0.5f,  0.5f, -0.5f,  roomSize.z, 0.0f,        0.0f,
-    //    -0.5f, -0.5f, -0.5f,  roomSize.z, roomSize.y,  0.0f,
-    //    -0.5f, -0.5f,  0.5f,  0.0f,       roomSize.y,  0.0f,
-
-    //     0.5f,  0.5f,  0.5f,  0.0f,       0.0f,        0.0f,
-    //     0.5f,  0.5f, -0.5f,  roomSize.z, 0.0f,        0.0f,
-    //     0.5f, -0.5f, -0.5f,  roomSize.z, roomSize.y,  0.0f,
-    //     0.5f, -0.5f,  0.5f,  0.0f,       roomSize.y,  0.0f,
-    //};
-
-    //std::vector<float> floor{
-    //    //Position            //Texture                //ID
-    //    -0.5f, -0.5f, -0.5f,  0.0f,       roomSize.z,  1.0f,
-    //     0.5f, -0.5f, -0.5f,  roomSize.x, roomSize.z,  1.0f,
-    //     0.5f, -0.5f,  0.5f,  roomSize.x, 0.0f,        1.0f,
-    //    -0.5f, -0.5f,  0.5f,  0.0f,       0.0f,        1.0f,
-    //};
-
-    //std::vector<float> ceiling{
-    //    //Position            //Texture                //ID
-    //    -0.5f,  0.5f, -0.5f,  0.0f,       roomSize.z,  2.0f,
-    //     0.5f,  0.5f, -0.5f,  roomSize.x, roomSize.z,  2.0f,
-    //     0.5f,  0.5f,  0.5f,  roomSize.x, 0.0f,        2.0f,
-    //    -0.5f,  0.5f,  0.5f,  0.0f,       0.0f,        2.0f,
-    //};
-
     auto& sharedData = SharedDataSingleton::getInstance();
     std::lock_guard<std::mutex> lock(sharedData.vectorMutex);
     roomSize = juce::Vector3D<float>(20.0f, 20.0f, 20.0f);
@@ -85,7 +50,7 @@ void RoomRender::initialise()
     cameraPos = Vector3D<float>(2.0f, 2.0f, 2.0f);
     sharedData.listenerPos = cameraPos;
 
-    //Make the listener box scale with the room to help manage the processing overhead
+    // Make the listener box scale with the room to help manage the processing overhead
     sharedData.listenerSize = roomSize / 20.0f;
     roomPos = roomSize / 2;
     sharedData.roomPos = roomPos;
@@ -95,7 +60,7 @@ void RoomRender::initialise()
     camera.lastX = width / 2;
     camera.lastY = height / 2;
 
-    //Add shapes
+    // Add shapes
     shape->addShapes(sharedData.walls, sharedData.floor, sharedData.ceiling, roomSize);
 }
 
@@ -235,7 +200,6 @@ void RoomRender::createShaders()
                 gl_FragColor = texture(texture2, texCoordOut);
             if (theTypeI == 2)
                 gl_FragColor = texture(texture3, texCoordOut);
-            //gl_FragColor = vec4(0.95, 0.57, 0.03, 0.7);
         }
         )";
 

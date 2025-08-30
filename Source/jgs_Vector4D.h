@@ -1,4 +1,18 @@
 /*
+ * Copyright (c) 2025 James G. Stanier
+ *
+ * This file is part of RoomReverbPlugin.
+ *
+ * This software is dual-licensed under:
+ *   1. The GNU General Public License v3.0 (GPLv3)
+ *   2. A commercial license (contact j.stanier766(at)gmail.com for details)
+ *
+ * You may use this file under the terms of the GPLv3 as published by
+ * the Free Software Foundation. For proprietary/commercial use,
+ * please see the LICENSE-COMMERCIAL file or contact the copyright holder.
+ */
+ 
+ /*
   ==============================================================================
 
    This file is part of the JUCE framework.
@@ -93,10 +107,6 @@ public:
     {
         auto&& m2 = m.mat;
 
-        //v'_x = M[0][0]*v_x + M[0][1]*v_y + M[0][2]*v_z + M[0][3]*v_w
-        //    v'_y = M[1][0]*v_x + M[1][1]*v_y + M[1][2]*v_z + M[1][3]*v_w
-        //    v'_z = M[2][0]*v_x + M[2][1]*v_y + M[2][2]*v_z + M[2][3]*v_w
-        //    v'_w = M[3][0]*v_x + M[3][1]*v_y + M[3][2]*v_z + M[3][3]*v_w
         return { m2[0] * other.x + m2[1] * other.y + m2[2] * other.z + m2[3] * other.w,
                  m2[4] * other.x + m2[5] * other.y + m2[6] * other.z + m2[7] * other.w,
                  m2[8] * other.x + m2[9] * other.y + m2[10] * other.z + m2[11] * other.w,

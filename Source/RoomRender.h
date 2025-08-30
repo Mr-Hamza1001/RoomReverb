@@ -1,12 +1,16 @@
 /*
-  ==============================================================================
-
-    RoomRender.h
-    Created: 21 Jul 2024 11:24:14am
-    Author:  jstan
-
-  ==============================================================================
-*/
+ * Copyright (c) 2025 James G. Stanier
+ *
+ * This file is part of RoomReverbPlugin.
+ *
+ * This software is dual-licensed under:
+ *   1. The GNU General Public License v3.0 (GPLv3)
+ *   2. A commercial license (contact j.stanier766(at)gmail.com for details)
+ *
+ * You may use this file under the terms of the GPLv3 as published by
+ * the Free Software Foundation. For proprietary/commercial use,
+ * please see the LICENSE-COMMERCIAL file or contact the copyright holder.
+ */
 
 #pragma once
 
@@ -163,7 +167,7 @@ private:
         
         void addShapes(std::vector<float> verticesWalls, std::vector<float> verticesFloor, std::vector<float> verticesCeiling, Vector3D<float> roomSize)
         {
-            //Modify the texture coordinates to accommodate size of room
+            // Modify the texture coordinates to accommodate size of room
             verticesWalls.at(9) *= roomSize.x;
             verticesWalls.at(15) *= roomSize.x;
             verticesWalls.at(16) *= roomSize.y;
@@ -189,7 +193,7 @@ private:
             verticesCeiling.at(16) *= roomSize.z;
             verticesCeiling.at(22) *= roomSize.z;
 
-            //Add shapes to vertex buffer and remove old vertices if there are any
+            // Add shapes to vertex buffer and remove old vertices if there are any
             if (vertexBuffers.size() != 0)
             {
                 vertexBuffers.clear(true);
@@ -197,14 +201,14 @@ private:
             vertexBuffers.add(new VertexBuffer(verticesWalls, verticesWalls.size()/4));
             vertexBuffers.add(new VertexBuffer(verticesFloor, verticesFloor.size()/4));
             vertexBuffers.add(new VertexBuffer(verticesCeiling, verticesCeiling.size()/4));
-            //Add texture(s) and remove old ones if there are any
+            // Add texture(s) and remove old ones if there are any
             if (textures.size() != 0)
             {
                 textures.clear(true);
             }
-            textures.add(new TextureFromFile(File("C:/Users/jstan/JUCE/Projects/RoomExample/Assets/Bricks060_1K-JPG_Color.jpg")));
-            textures.add(new TextureFromFile(File("C:/Users/jstan/JUCE/Projects/RoomExample/Assets/Wood090A_1K-JPG_Color.jpg")));
-            textures.add(new TextureFromFile(File("C:/Users/jstan/JUCE/Projects/RoomExample/Assets/Tiles136A_1K-JPG_Color.jpg")));
+            textures.add(new TextureFromFile(File("../../Assets/Bricks060_1K-JPG_Color.jpg")));
+            textures.add(new TextureFromFile(File("../../Assets/Wood090A_1K-JPG_Color.jpg")));
+            textures.add(new TextureFromFile(File("../../Assets/Tiles136A_1K-JPG_Color.jpg")));
         }
 
         void modifyShapes(Vector3D<float> size)
@@ -223,7 +227,6 @@ private:
             glAttributes.enable();
             glActiveTexture(GL_TEXTURE0);
             texture1.bind();
-            //glDrawArrays(GL_TRIANGLES, 0, vertexBuffers[0]->numberTriangles);
             glDrawElements(GL_TRIANGLES, 24, GL_UNSIGNED_INT, 0);
             glAttributes.disable();
 
@@ -234,7 +237,6 @@ private:
             glAttributes.enable();
             glActiveTexture(GL_TEXTURE1);
             texture2.bind();
-            //glDrawArrays(GL_TRIANGLES, 0, vertexBuffers[1]->numberTriangles);
             glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
             glAttributes.disable();
 
@@ -245,7 +247,6 @@ private:
             glAttributes.enable();
             glActiveTexture(GL_TEXTURE2);
             texture3.bind();
-            //glDrawArrays(GL_TRIANGLES, 0, vertexBuffers[2]->numberTriangles);
             glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
             glAttributes.disable();
 

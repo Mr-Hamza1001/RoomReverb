@@ -1,12 +1,16 @@
 /*
-  ==============================================================================
-
-    ProcessReflections.cpp
-    Created: 25 Jul 2024 10:28:05am
-    Author:  jstan
-
-  ==============================================================================
-*/
+ * Copyright (c) 2025 James G. Stanier
+ *
+ * This file is part of RoomReverbPlugin.
+ *
+ * This software is dual-licensed under:
+ *   1. The GNU General Public License v3.0 (GPLv3)
+ *   2. A commercial license (contact j.stanier766(at)gmail.com for details)
+ *
+ * You may use this file under the terms of the GPLv3 as published by
+ * the Free Software Foundation. For proprietary/commercial use,
+ * please see the LICENSE-COMMERCIAL file or contact the copyright holder.
+ */
 
 #include <iostream>
 #include <vector>
@@ -24,7 +28,7 @@ void ProcessReflections::run()
     DBG("Process Reflections Thread is running...");
     //juce::Thread::sleep(1000); // Sleep for 1 second
 
-	//Open CSV file for writing
+	// Open CSV file for writing
 	cSVFile.open("data_dump.csv");
 
 	roomSetup();
@@ -51,17 +55,17 @@ void ProcessReflections::roomSetup()
 	listenerSize = sharedData.listenerSize;
 	soundSourcePos = sharedData.soundSourcePos;
 
-	//Room model translations
+	// Room model translations
 	modelRoom = modelRoom.translation(roomPos);
 	modelRoom = modelRoom.scaled(roomSize);
 	modelRoom = modelRoom.transpose();
 
-	//Listener model translations
+	// Listener model translations
 	modelListener = modelListener.translation(listenerPos);
 	modelListener = modelListener.scaled(listenerSize);
 	modelListener = modelListener.transpose();
 
-	//Construct a set of vertices from the OpenGL room vertices
+	// Construct a set of vertices from the OpenGL room vertices
 	boxVertices = sharedData.floor;
 	boxVertices.insert(boxVertices.end(), sharedData.walls.begin(), sharedData.walls.end());
 	boxVertices.insert(boxVertices.end(), sharedData.ceiling.begin(), sharedData.ceiling.end());
@@ -75,7 +79,12 @@ void ProcessReflections::roomSetup()
 }
 
 /***************************************************************/
-//Pass 1
+// Pass 1
+//
+// Send out rays in a spherically random distribution as
+// possible, with granularity set by POLAR_SUBDIVISIONS. 
+// Test each ray intersection with listener and room and store
+// success in arrays.
 /***************************************************************/
 void ProcessReflections::pass1()
 {
@@ -88,9 +97,7 @@ void ProcessReflections::pass1()
 	juce::Vector3D<float> zeroVector = juce::Vector3D<float>(0.0f, 0.0f, 0.0f);
 	for (int i = 0; i < 2 * POLAR_SUBDIVISIONS; i++) { //azimuth
 		for (int j = 0; j < POLAR_SUBDIVISIONS; j++) { //polar
-			//polar = ((float)M_PI * j) / POLAR_SUBDIVISIONS;
-			//azimuth = ((float)M_PI * i) / POLAR_SUBDIVISIONS;
-			polar = (juce::MathConstants<float>::pi / 2) - asin(1 - 2 * random.nextFloat());
+			polar = (juce::MathConstants<float>::pi / 2) - asin(1 - 2 * random.nextFloat()); // Distribute the rays around the sphere as randomly as possible (no clustering at the poles)
 			azimuth = random.nextFloat() * 2.0 * juce::MathConstants<float>::pi;
 			Spherical rayDirectionS(1.0f, azimuth, polar);
 			Cartesian rayDirectionC = rayDirectionS.sph_to_car();
@@ -111,7 +118,7 @@ void ProcessReflections::pass1()
 				ray.origin = rayVectors[i][j][k - 1][0];
 				ray.direction = rayVectors[i][j][k - 1][1];
 
-				//Perform ray cast with listener box
+				// Perform ray cast with listener box
 				// Set initial distance to something far, far away.
 				float result = FLT_MAX;
 
@@ -123,9 +130,10 @@ void ProcessReflections::pass1()
 
 				juce::Vector3D<float> v0, v1, v2;
 				int index;
-				juce::Vector3D<float>intersect;
+				juce::Vector3D<float> intersect;
 				juce::Vector3D<float> pos;
-				//Build and transform triangle vertices
+
+				// Build and transform triangle vertices
 				for (size_t l = 0; l < 36; l += 3)
 				{
 					index = boxIndices[l + 0];
@@ -154,7 +162,7 @@ void ProcessReflections::pass1()
 					triangle.v2 = v2;
 
 
-					//Test to see if the ray intersects this triangle.
+					// Test to see if the ray intersects this triangle.
 					test = intersectRayTriangle(ray, triangle, distance, intersect);
 					if (test) {
 						// Keep the result if it's closer than any intersection we've had so far.
@@ -169,7 +177,7 @@ void ProcessReflections::pass1()
 				}
 
 				if (result < FLT_MAX) {
-					//Store listener intersection data
+					// Store listener intersection data
 					listenerVectors[i][j][k - 1][0] = pos;
 					listenerVectors[i][j][k - 1][1] = ray.direction.normalised();
 
@@ -183,7 +191,7 @@ void ProcessReflections::pass1()
 					listenerVectors[i][j][k - 1][1] = zeroVector;
 				}
 
-				//Perform ray cast with the room
+				// Perform ray cast with the room
 				// Set initial distance to something far, far away.
 				result = FLT_MAX;
 
@@ -221,7 +229,7 @@ void ProcessReflections::pass1()
 					triangle.v2 = v2;
 
 
-					//Test to see if the ray intersects this triangle.
+					// Test to see if the ray intersects this triangle.
 					test = intersectRayTriangle(ray, triangle, distance, intersect);
 					if (test) {
 						// Keep the result if it's closer than any intersection we've had so far.
@@ -253,8 +261,8 @@ void ProcessReflections::pass1()
 		}
 	}
 
-	//Calculate distances ray has travelled and number of reflections when it hits the listener box to get impulse response
-	//Check to see if any reflections pass through sphere during entire path
+	// Calculate distances ray has travelled and number of reflections when it hits the listener box to get impulse response
+	// Check to see if any reflections pass through sphere during entire path
 	float accDistance = 0.0;
 	float listenerDistance = 0.0;
 	bool bReflectionCaught = false;
@@ -291,7 +299,7 @@ void ProcessReflections::pass1()
 		}
 	}
 
-	//Determine contents of listener array, populated with delay time (ms) and attenuation
+	// Determine contents of listener array, populated with delay time (ms) and attenuation
 	count = 0;
 	for (int i = 0; i < 2 * POLAR_SUBDIVISIONS; i++)
 	{
@@ -321,7 +329,12 @@ void ProcessReflections::pass1()
 }
 
 /***************************************************************/
-//Pass 2
+// Pass 2
+// 
+// The array containing all the successful hits is iterated 
+// through, and a number of additional rays are sent out in the
+// vicinity of the original ray. This is to refine the search 
+// for the best paths.
 /***************************************************************/
 void ProcessReflections::pass2()
 {
@@ -333,14 +346,14 @@ void ProcessReflections::pass2()
 	juce::Vector3D<float> zeroVector = juce::Vector3D<float>(0.0f, 0.0f, 0.0f);
 	for (int i = 0; i < count; i++)
 	{
-		//Get original ray direction
+		// Get original ray direction
 		originalDirection = rayVectors[(int)floatListenerArray[i][1]][(int)floatListenerArray[i][2]][0][1];
-		//Convert to Spherical coordinates
+		// Convert to Spherical coordinates
 		Cartesian origDirC(originalDirection.x, originalDirection.y, originalDirection.z);
 		Spherical origDirS = origDirC.car_to_sph();
 		for (int j = 0; j < additionalRays; j++)
 		{
-			//Calculate distribution range from original number of rays
+			// Calculate distribution range from original number of rays
 			polar = origDirS.get_phi() + (asin(1 - 2 * random2.nextFloat())) / POLAR_SUBDIVISIONS;
 			azimuth = origDirS.get_theta() + (2 * juce::MathConstants<float>::pi * (0.5f - random2.nextFloat())) / (2 * POLAR_SUBDIVISIONS);
 			azimuth = fmodf(azimuth, 2 * juce::MathConstants<float>::pi);
@@ -363,7 +376,7 @@ void ProcessReflections::pass2()
 				ray.origin = rayVectors2[i][j][k - 1][0];
 				ray.direction = rayVectors2[i][j][k - 1][1];
 
-				//Perform ray cast with listener box
+				// Perform ray cast with listener box
 				// Set initial distance to something far, far away.
 				float result = FLT_MAX;
 
@@ -375,9 +388,9 @@ void ProcessReflections::pass2()
 
 				juce::Vector3D<float> v0, v1, v2;
 				int index;
-				juce::Vector3D<float>intersect;
+				juce::Vector3D<float> intersect;
 				juce::Vector3D<float> pos;
-				//Build and transform triangle vertices
+				// Build and transform triangle vertices
 				for (size_t l = 0; l < 36; l += 3)
 				{
 					index = boxIndices[l + 0];
@@ -406,7 +419,7 @@ void ProcessReflections::pass2()
 					triangle.v2 = v2;
 
 
-					//Test to see if the ray intersects this triangle.
+					// Test to see if the ray intersects this triangle.
 					test = intersectRayTriangle(ray, triangle, distance, intersect);
 					if (test) {
 						// Keep the result if it's closer than any intersection we've had so far.
@@ -421,7 +434,7 @@ void ProcessReflections::pass2()
 				}
 
 				if (result < FLT_MAX) {
-					//Store listener intersection data
+					// Store listener intersection data
 					listenerVectors2[i][j][k - 1][0] = pos;
 					listenerVectors2[i][j][k - 1][1] = ray.direction.normalised();
 
@@ -435,7 +448,7 @@ void ProcessReflections::pass2()
 					listenerVectors2[i][j][k - 1][1] = zeroVector;
 				}
 
-				//Perform ray cast with the room
+				// Perform ray cast with the room
 				// Set initial distance to something far, far away.
 				result = FLT_MAX;
 
@@ -473,7 +486,7 @@ void ProcessReflections::pass2()
 					triangle.v2 = v2;
 
 
-					//Test to see if the ray intersects this triangle.
+					// Test to see if the ray intersects this triangle.
 					test = intersectRayTriangle(ray, triangle, distance, intersect);
 					if (test) {
 						// Keep the result if it's closer than any intersection we've had so far.
@@ -490,7 +503,6 @@ void ProcessReflections::pass2()
 				if (result < FLT_MAX) {
 					rayReflect = reflect(ray.direction.normalised(), rayNormal);
 
-					//juce::Vector3D<float> pos = intersect;
 					rayVectors2[i][j][k][0] = pos;
 					rayVectors2[i][j][k][1] = rayReflect;
 
@@ -505,20 +517,20 @@ void ProcessReflections::pass2()
 		}
 	}
 
-	//Calculate distances ray has travelled and number of reflections when it hits the listener box to get impulse response
-	//Check to see if any reflections pass through sphere during entire path
+	// Calculate distances ray has travelled and number of reflections when it hits the listener box to get impulse response
+	// Check to see if any reflections pass through sphere during entire path
 	float accDistance = 0.0f;
 	float listenerDistance = 0.0f;
 	bool bReflectionCaught = false;
 	juce::Vector3D<float> vd;
-	for (int i = 0; i < count; i++) //azimuth
+	for (int i = 0; i < count; i++) // azimuth
 	{
-		for (int j = 0; j < additionalRays; j++) //polar
+		for (int j = 0; j < additionalRays; j++) // polar
 		{
 			bReflectionCaught = false;
 			for (int k = 0; k < NUM_REFLECTIONS; k++)
 			{
-				listenerDistances2[i][j][k][0] = 0.0f; //zero out value to start with
+				listenerDistances2[i][j][k][0] = 0.0f; // zero out distance value to start with
 				if (listenerVectors2[i][j][k][0].x != 0.0f && listenerVectors2[i][j][k][0].y != 0.0f && listenerVectors2[i][j][k][0].z != 0.0f)
 				{
 					bReflectionCaught = true;
@@ -526,7 +538,7 @@ void ProcessReflections::pass2()
 			}
 
 			if (bReflectionCaught) {
-				//Add up distances, and if present, add to distance array
+				// Add up distances, and if present, add to distance array
 				accDistance = 0.0;
 				for (int k = 0; k < NUM_REFLECTIONS - 1; k++)
 				{
@@ -543,7 +555,7 @@ void ProcessReflections::pass2()
 		}
 	}
 
-	//Determine contents of listener array, populated with delay time (ms) and attenuation
+	// Determine contents of listener array, populated with delay time (ms) and attenuation
 	count2 = 0;
 	for (int i = 0; i < count; i++)
 	{
@@ -573,20 +585,20 @@ void ProcessReflections::pass2()
 }
 
 /***************************************************************/
-//Populate an IR and save as a wav file
+// Populate an IR and save as a wav file
 /***************************************************************/
 void ProcessReflections::populateIR()
 {
-	//Generate impulse response from combined listener arrays
-	//Copy arrays to a vector
+	// Generate impulse response from combined listener arrays
+	// Copy arrays to a vector
 	std::vector<std::vector<float>> listenerVector1, listenerVector2;
-	//Copy first array
+	// Copy first array from first pass
 	for (size_t i = 0; i < sizeof(floatListenerArray) / sizeof(floatListenerArray[0]); ++i)
 	{
 		listenerVector1.push_back(std::vector<float>(floatListenerArray[i], floatListenerArray[i] + sizeof(floatListenerArray[i]) / sizeof(float)));
 	}
 
-	//Copy second array
+	// Copy second array from second pass
 	for (size_t i = 0; i < sizeof(floatListenerArray2) / sizeof(floatListenerArray2[0]); ++i)
 	{
 		listenerVector2.push_back(std::vector<float>(floatListenerArray2[i], floatListenerArray2[i] + sizeof(floatListenerArray2[i]) / sizeof(float)));
@@ -595,7 +607,7 @@ void ProcessReflections::populateIR()
 	listenerVector1.resize(count);
 	listenerVector2.resize(count2);
 
-	//Combine vectors into one, passing in the delay, azimuth. polar and attenuation values only
+	// Combine vectors into one, passing in the delay, azimuth. polar and attenuation values only
 	std::vector<std::vector<float>> combinedVector;
 	float s = 1.0f;
 	for (int i = 0; i < listenerVector1.size(); i++)
@@ -623,7 +635,7 @@ void ProcessReflections::populateIR()
 			s / (pow(delay, rollOff) * additionalRays * 0.3f) }); // Attenuation
 	}
 
-	//Sort combined vector by delay, azimuth, then polar buckets
+	// Sort combined vector by delay, azimuth, then polar buckets
 	std::sort(combinedVector.begin(), combinedVector.end(), [](std::vector<float> const& a, std::vector<float> const& b) {
 	if (a[0] != b[0]) return a[0] < b[0]; // Compare by column delay
 	if (a[1] != b[1]) return a[1] < b[1]; // Compare by column azimuth
@@ -636,7 +648,7 @@ void ProcessReflections::populateIR()
 	//	cSVFile << combinedVector[i][0] << "," << combinedVector[i][1] << "," << combinedVector[i][2] << "," << combinedVector[i][3] << "\n";
 	//}
 
-	//Remove duplicates whilst accumulating attenuation values
+	// Remove duplicates whilst accumulating attenuation values
 	float delayDup = combinedVector[0][0];
 	float azimuthDup = combinedVector[0][1];
 	float polarDup = combinedVector[0][2];
@@ -645,36 +657,36 @@ void ProcessReflections::populateIR()
 	combinedVectorDup.push_back({ delayDup, azimuthDup, polarDup, attenuationDup });
 	int indexDup = 0;
 	for (int i = 0; i < combinedVector.size(); i++) {
-		if (delayDup == combinedVector[i][0] && azimuthDup == combinedVector[i][1] && polarDup == combinedVector[i][2]) { //Duplicates found
-			//Accumulate attenuation
+		if (delayDup == combinedVector[i][0] && azimuthDup == combinedVector[i][1] && polarDup == combinedVector[i][2]) { // Duplicates found
+			// Accumulate attenuation
 			attenuationDup += combinedVector[i][3];
 			combinedVectorDup[indexDup][3] = attenuationDup;
 		}
-		else if (delayDup != combinedVector[i][0] || azimuthDup != combinedVector[i][1] || polarDup != combinedVector[i][2]) { //Unique value found
+		else if (delayDup != combinedVector[i][0] || azimuthDup != combinedVector[i][1] || polarDup != combinedVector[i][2]) { // Unique value found
 			indexDup++;
 			delayDup = combinedVector[i][0];
 			azimuthDup = combinedVector[i][1];
 			polarDup = combinedVector[i][2];
 			attenuationDup = combinedVector[i][3];
-			//Add values to new array
+			// Add values to new array
 			combinedVectorDup.push_back({ delayDup, azimuthDup, polarDup, attenuationDup });
 		}
 	}
 
-	//Normalise attenuation to max 1.0f
-	//First find maximum value
+	// Normalise attenuation to max 1.0f
+	// First find maximum value
 	float maxValue = 0.0f;
 	for (int i = 0; i < combinedVectorDup.size(); i++)
 	{
 		if (fabs(combinedVectorDup[i][3]) > maxValue) maxValue = fabs(combinedVectorDup[i][3]);
 	}
-	//Apply to entire array to normalise it
+	// Apply to entire array to normalise it
 	for (int i = 0; i < combinedVectorDup.size(); i++)
 	{
 		combinedVectorDup[i][3] /= maxValue;
 	}
 
-	//Output combined array with duplicates removed to CSV file
+	// Output combined array with duplicates removed to CSV file
 	for (int i = 0; i < combinedVectorDup.size(); i++)
 	{
 		cSVFile << combinedVectorDup[i][0] << "," << combinedVectorDup[i][1] << "," << combinedVectorDup[i][2] << "," << combinedVectorDup[i][3] << "\n";
@@ -684,7 +696,7 @@ void ProcessReflections::populateIR()
 
 	// Add vertical localisation cues
 
-	//Output IR to wave file
+	// Output IR to wave file
 	WavAudioFormat wavFormat;
 	File outputFile = File::getCurrentWorkingDirectory().getChildFile("output.wav");
 	if (outputFile.existsAsFile()) outputFile.deleteFile();
@@ -721,6 +733,7 @@ void ProcessReflections::populateIR()
 	outputStream.release();
 }
 
+// Standard Möller-Trumbore algorithm
 bool ProcessReflections::intersectRayTriangle(const Ray& ray, const Triangle& triangle, float& t, juce::Vector3D<float>& intersectionPoint)
 {
     const float EPSILON = 1e-8;
@@ -762,7 +775,7 @@ bool ProcessReflections::intersectRayTriangle(const Ray& ray, const Triangle& tr
 
 juce::Vector3D<float> ProcessReflections::reflect(juce::Vector3D<float> line, juce::Vector3D<float> normal) 
 {
-	//Reflection equation: d - 2(d.n)n
+	// Reflection equation: d - 2(d.n)n
 	return line - (normal * (line * normal)) * (2.0f);
 }
 

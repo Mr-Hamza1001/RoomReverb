@@ -1,4 +1,18 @@
 /*
+ * Copyright (c) 2025 James G. Stanier
+ *
+ * This file is part of RoomReverbPlugin.
+ *
+ * This software is dual-licensed under:
+ *   1. The GNU General Public License v3.0 (GPLv3)
+ *   2. A commercial license (contact j.stanier766(at)gmail.com for details)
+ *
+ * You may use this file under the terms of the GPLv3 as published by
+ * the Free Software Foundation. For proprietary/commercial use,
+ * please see the LICENSE-COMMERCIAL file or contact the copyright holder.
+ */
+ 
+ /*
   ==============================================================================
 
     This file contains the basic framework code for a JUCE plugin editor.

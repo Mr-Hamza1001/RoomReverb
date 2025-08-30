@@ -1,12 +1,16 @@
 /*
-  ==============================================================================
-
-    ExMatrix3D.h
-    Created: 6 Aug 2024 9:06:12am
-    Author:  jstan
-
-  ==============================================================================
-*/
+ * Copyright (c) 2025 James G. Stanier
+ *
+ * This file is part of RoomReverbPlugin.
+ *
+ * This software is dual-licensed under:
+ *   1. The GNU General Public License v3.0 (GPLv3)
+ *   2. A commercial license (contact j.stanier766(at)gmail.com for details)
+ *
+ * You may use this file under the terms of the GPLv3 as published by
+ * the Free Software Foundation. For proprietary/commercial use,
+ * please see the LICENSE-COMMERCIAL file or contact the copyright holder.
+ */
 
 #pragma once
 #include <juce_opengl/juce_opengl.h>
@@ -65,10 +69,6 @@ public:
         const auto s = Vector3D<Type>(f ^ up).normalised();
         const auto u = s ^ f;
 
-        //return { s.x, s.y, s.z, 0,
-        //        u.x, u.y, u.z, 0,
-        //        -f.x, -f.y, -f.z, 0,
-        //        -(s * eye),  -(u * eye), (f * eye), Type(1) };
         return { s.x, u.x, -f.x, 0,
                 s.y, u.y, -f.y, 0,
                 s.z, u.z, -f.z, 0,
@@ -93,10 +93,6 @@ public:
     /** Returns a translation matrix. */
     static Matrix3D translation(Vector3D<Type> delta) noexcept
     {
-        //return { Type(1), 0, 0, delta.x,
-        //         0, Type(1), 0, delta.y,
-        //         0, 0, Type(1), delta.z,
-        //         0, 0, 0, Type(1) };
         return { Type(1), 0, 0, 0,
                  0, Type(1), 0, 0,
                  0, 0, Type(1), 0,
