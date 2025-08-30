@@ -69,7 +69,7 @@ void ProcessReflections::roomSetup()
 	sharedData.speedOfSound = speedOfSound = 346.0f;
 	sharedData.additionalRays = additionalRays = 10;
 	sharedData.rollOff = rollOff = 1.0f;
-	sharedData.delayBucketSize = delayBucketSize = 0.1f;
+	sharedData.delayBucketSize = delayBucketSize = 1.0f / 44.1f; //ms
 	sharedData.numberPolarBuckets = numberPolarBuckets = 20;
 
 }
@@ -597,21 +597,30 @@ void ProcessReflections::populateIR()
 
 	//Combine vectors into one, passing in the delay, azimuth. polar and attenuation values only
 	std::vector<std::vector<float>> combinedVector;
+	float s = 1.0f;
 	for (int i = 0; i < listenerVector1.size(); i++)
 	{
 		float delay = ceil(listenerVector1[i][4] * 100.0f) / (delayBucketSize * 100.0f);
-		combinedVector.push_back({ delay,
-			ceil(listenerVector1[i][5] * numberPolarBuckets / juce::MathConstants<float>::pi),
-			ceil(listenerVector1[i][6] * numberPolarBuckets / juce::MathConstants<float>::pi),
-			1.0f / pow(delay, rollOff) });
+		// Apply polarity to impulses
+		if ((int)listenerVector1[i][3] % 2 == 0) s = 1.0f;
+		else s = -1.0f;
+
+		combinedVector.push_back({ delay, // Delay
+			ceil(listenerVector1[i][5] * numberPolarBuckets / juce::MathConstants<float>::pi), // Azimuth
+			ceil(listenerVector1[i][6] * numberPolarBuckets / juce::MathConstants<float>::pi), // Elevation
+			s / pow(delay, rollOff) }); // Attenuation
 	}
 	for (int i = 0; i < listenerVector2.size(); i++)
 	{
 		float delay = ceil(listenerVector2[i][4] * 100.0f) / (delayBucketSize * 100.0f);
-		combinedVector.push_back({ delay,
-			ceil(listenerVector2[i][5] * numberPolarBuckets / juce::MathConstants<float>::pi),
-			ceil(listenerVector2[i][6] * numberPolarBuckets / juce::MathConstants<float>::pi),
-			1.0f / (pow(delay, rollOff) * additionalRays) });
+		// Apply polarity to impulses
+		if ((int)listenerVector2[i][3] % 2 == 0) s = 1.0f;
+		else s = -1.0f;
+
+		combinedVector.push_back({ delay, // Delay
+			ceil(listenerVector2[i][5] * numberPolarBuckets / juce::MathConstants<float>::pi), // Azimuth
+			ceil(listenerVector2[i][6] * numberPolarBuckets / juce::MathConstants<float>::pi), // Elevation
+			s / (pow(delay, rollOff) * additionalRays * 0.3f) }); // Attenuation
 	}
 
 	//Sort combined vector by delay, azimuth, then polar buckets
@@ -657,7 +666,7 @@ void ProcessReflections::populateIR()
 	float maxValue = 0.0f;
 	for (int i = 0; i < combinedVectorDup.size(); i++)
 	{
-		if (combinedVectorDup[i][3] > maxValue) maxValue = combinedVectorDup[i][3];
+		if (fabs(combinedVectorDup[i][3]) > maxValue) maxValue = fabs(combinedVectorDup[i][3]);
 	}
 	//Apply to entire array to normalise it
 	for (int i = 0; i < combinedVectorDup.size(); i++)
@@ -671,6 +680,10 @@ void ProcessReflections::populateIR()
 		cSVFile << combinedVectorDup[i][0] << "," << combinedVectorDup[i][1] << "," << combinedVectorDup[i][2] << "," << combinedVectorDup[i][3] << "\n";
 	}
 
+	// Add hrizontal localisation cues
+
+	// Add vertical localisation cues
+
 	//Output IR to wave file
 	WavAudioFormat wavFormat;
 	File outputFile = File::getCurrentWorkingDirectory().getChildFile("output.wav");
@@ -679,7 +692,7 @@ void ProcessReflections::populateIR()
 
 	std::unique_ptr<AudioFormatWriter> writer(wavFormat.createWriterFor(outputStream.get(),
 		44100, // Sample rate
-		1,     // Number of channels
+		2,     // Number of channels
 		16,    // Bits per sample
 		{},    // Metadata
 		0));   // Quality
@@ -687,7 +700,7 @@ void ProcessReflections::populateIR()
 	if (writer != nullptr)
 	{
 		int bufferSize = (int)((44100.0f * (combinedVectorDup[combinedVectorDup.size() - 1][0] + 1) * delayBucketSize) / 1000.0f);
-		AudioBuffer<float> buffer(1, bufferSize);
+		AudioBuffer<float> buffer(2, bufferSize);
 		buffer.clear();
 
 		// Fill the buffer with your audio data
@@ -749,7 +762,6 @@ bool ProcessReflections::intersectRayTriangle(const Ray& ray, const Triangle& tr
 
 juce::Vector3D<float> ProcessReflections::reflect(juce::Vector3D<float> line, juce::Vector3D<float> normal) 
 {
-
 	//Reflection equation: d - 2(d.n)n
 	return line - (normal * (line * normal)) * (2.0f);
 }

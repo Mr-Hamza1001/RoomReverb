@@ -58,8 +58,8 @@ private:
 
     std::ofstream cSVFile;
 
-    static const int POLAR_SUBDIVISIONS = 100;
-    static const int NUM_REFLECTIONS = 20;
+    static const int POLAR_SUBDIVISIONS = 80;
+    static const int NUM_REFLECTIONS = 15;
     juce::Vector3D<float> rayVectors[2 * POLAR_SUBDIVISIONS][POLAR_SUBDIVISIONS][NUM_REFLECTIONS][2]{};
     juce::Vector3D<float> listenerVectors[2 * POLAR_SUBDIVISIONS][POLAR_SUBDIVISIONS][NUM_REFLECTIONS][2]{};
     float listenerDistances[2 * POLAR_SUBDIVISIONS][POLAR_SUBDIVISIONS][NUM_REFLECTIONS][1]{}; //azimuth, polar, reflection count, distance
