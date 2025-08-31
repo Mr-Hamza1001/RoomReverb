@@ -89,3 +89,4 @@ For commercial licensing options, please contact the project maintainer.
 ## 🙌 Acknowledgements
 
 Built with [JUCE](https://juce.com/), an open-source cross-platform C++ framework for audio and GUI applications.
+Help with the camera header and other OpenGL features from [LearnOpenGL](https://learnopengl.com/).
