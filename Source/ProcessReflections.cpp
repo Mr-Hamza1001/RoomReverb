@@ -16,6 +16,7 @@
 #include <vector>
 #include <algorithm>
 #include <JuceHeader.h>
+#include <cfloat>
 #include "ProcessReflections.h"
 #include "Spherical.h"
 #include "SharedData.h"
@@ -779,7 +780,7 @@ juce::Vector3D<float> ProcessReflections::reflect(juce::Vector3D<float> line, ju
 	return line - (normal * (line * normal)) * (2.0f);
 }
 
-void ProcessReflections::transformVector(juce::Vector3D<float>& v, juce::Matrix3D<float> mat)
+void ProcessReflections::transformVector(juce::Vector3D<float>& v, ExMatrix3D<float> mat)
 {
 	jgs::Vector4D<float> v4D = jgs::Vector4D<float>(v.x, v.y, v.z, 1.0f);
 	v4D = v4D.transformed(v4D, mat);

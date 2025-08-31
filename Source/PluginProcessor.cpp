@@ -22,6 +22,7 @@
 
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
+#include <JucePluginDefines.h>
 
 //==============================================================================
 RoomReverbPluginAudioProcessor::RoomReverbPluginAudioProcessor()

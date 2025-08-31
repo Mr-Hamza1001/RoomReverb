@@ -79,5 +79,5 @@ private:
 
     bool intersectRayTriangle(const Ray& ray, const Triangle& triangle, float& t, juce::Vector3D<float>& intersectionPoint);
     juce::Vector3D<float> reflect(juce::Vector3D<float> line, juce::Vector3D<float> normal);
-    void transformVector(juce::Vector3D<float>& v, juce::Matrix3D<float> mat);
+    void transformVector(juce::Vector3D<float>& v, ExMatrix3D<float> mat);
 };

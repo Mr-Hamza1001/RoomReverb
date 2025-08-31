@@ -21,12 +21,13 @@ template <typename Type>
 class ExMatrix3D : public juce::Matrix3D<Type>
 {
 public:
+
     ExMatrix3D() : juce::Matrix3D<Type>() {}
 
     ExMatrix3D(const juce::Matrix3D<Type>& other) : juce::Matrix3D<Type>(other) {}
 
     /** Returns a new matrix from the given ortho values. */
-    static Matrix3D fromOrtho(Type left, Type right, Type bottom, Type top, Type nearDistance, Type farDistance) noexcept
+    static Matrix3D<Type> fromOrtho(Type left, Type right, Type bottom, Type top, Type nearDistance, Type farDistance) noexcept
     {
         return { Type(2) / (right - left), 0, 0, 0,
                  0, Type(2) / (top - bottom), 0, 0,
@@ -35,7 +36,7 @@ public:
     }
 
     /** Returns a new matrix from the given perspective values. */
-    static Matrix3D fromPerspective(Type fieldOfViewY, Type aspect, Type nearDistance, Type farDistance) noexcept
+    static Matrix3D<Type> fromPerspective(Type fieldOfViewY, Type aspect, Type nearDistance, Type farDistance) noexcept
     {
         const auto tanHalfFovY = std::tan(fieldOfViewY / Type(2));
 
@@ -46,7 +47,7 @@ public:
     }
 
     /** Returns a new matrix from the given perspective field of view values. */
-    static Matrix3D fromPerspectiveFieldOfView(Type fieldOfView, Type width, Type height, Type nearDistance, Type farDistance) noexcept
+    static Matrix3D<Type> fromPerspectiveFieldOfView(Type fieldOfView, Type width, Type height, Type nearDistance, Type farDistance) noexcept
     {
         jassert(width > Type(0));
         jassert(height > Type(0));
@@ -63,7 +64,7 @@ public:
     }
 
     /** Returns a new look-at matrix from the provided vectors. */
-    static Matrix3D fromLookAt(Vector3D<Type> eye, Vector3D<Type> center, Vector3D<Type> up) noexcept
+    static Matrix3D<Type> fromLookAt(Vector3D<Type> eye, Vector3D<Type> center, Vector3D<Type> up) noexcept
     {
         const auto f = Vector3D<Type>(center - eye).normalised();
         const auto s = Vector3D<Type>(f ^ up).normalised();
@@ -76,8 +77,10 @@ public:
     }
 
     /** Returns a matrix which will apply a scale specified by a vector. */
-    Matrix3D scaled(Vector3D<Type> scalar) noexcept
+    Matrix3D<Type> scaled(Vector3D<Type> scalar)
     {
+        Type* mat = Matrix3D<Type>::mat;
+
         return { mat[0] * scalar.x, mat[1] * scalar.x, mat[2] * scalar.x, mat[3] * scalar.x,
                  mat[4] * scalar.y, mat[5] * scalar.y, mat[6] * scalar.y, mat[7] * scalar.y,
                  mat[8] * scalar.z, mat[9] * scalar.z, mat[10] * scalar.z, mat[11] * scalar.z,
@@ -91,7 +94,7 @@ public:
     }
 
     /** Returns a translation matrix. */
-    static Matrix3D translation(Vector3D<Type> delta) noexcept
+    static Matrix3D<Type> translation(Vector3D<Type> delta) noexcept
     {
         return { Type(1), 0, 0, 0,
                  0, Type(1), 0, 0,
@@ -100,12 +103,14 @@ public:
     }
 
     /** Returns a matrix which will apply a translation specified by the provided vector. */
-    Matrix3D translated(Vector3D<Type> delta) noexcept
+    Matrix3D<Type> translated(Vector3D<Type> delta)
     {
+        Type* mat = Matrix3D<Type>::mat;
+
         return { mat[0], mat[1], mat[2], mat[2] * delta.x,
                  mat[5], mat[6], mat[7], mat[2] * delta.y,
                  mat[9], mat[10], mat[11], mat[2] * delta.z,
-                 mat[13], mat[14], mat[15], mat[16] };
+                 mat[12], mat[13], mat[14], mat[15] };
     }
 
     /** Translates this matrix by the provided vector. */
@@ -115,12 +120,13 @@ public:
     }
 
     /** Returns a matrix which will apply a translation specified by the provided vector. */
-    Matrix3D transpose() noexcept
+    Matrix3D<Type> transpose()
     {
+        Type* mat = Matrix3D<Type>::mat;
+
         return { mat[0], mat[4], mat[8], mat[12],
                  mat[1], mat[5], mat[9], mat[13],
                  mat[2], mat[6], mat[10], mat[14],
                  mat[3], mat[7], mat[11], mat[15] };
     }
-
 };

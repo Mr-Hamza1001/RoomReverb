@@ -206,9 +206,18 @@ private:
             {
                 textures.clear(true);
             }
-            textures.add(new TextureFromFile(File("../../Assets/Bricks060_1K-JPG_Color.jpg")));
-            textures.add(new TextureFromFile(File("../../Assets/Wood090A_1K-JPG_Color.jpg")));
-            textures.add(new TextureFromFile(File("../../Assets/Tiles136A_1K-JPG_Color.jpg")));
+            
+            // Import textures from binary data
+            textures.add(new TextureFromBinary(BinaryData::Bricks060_1KJPG_Color_jpg,
+                (size_t)BinaryData::Bricks060_1KJPG_Color_jpgSize,
+                "Bricks060_1K-JPG_Color.jpg"));
+            textures.add(new TextureFromBinary(BinaryData::Wood090A_1KJPG_Color_jpg,
+                (size_t)BinaryData::Wood090A_1KJPG_Color_jpgSize,
+                "Wood090A_1K-JPG_Color.jpg"));
+            textures.add(new TextureFromBinary(BinaryData::Tiles136A_1KJPG_Color_jpg,
+                (size_t)BinaryData::Tiles136A_1KJPG_Color_jpgSize,
+                "Tiles136A_1K-JPG_Color.jpg"));
+
         }
 
         void modifyShapes(Vector3D<float> size)
@@ -321,6 +330,26 @@ private:
             {
                 name = file.getFileName();
                 image = ImageFileFormat::loadFrom(file);
+                jassert(!image.isNull());
+            }
+
+            Image image;
+            String name;
+
+            bool applyTo(OpenGLTexture& texture)
+            {
+                texture.loadImage(image);
+                return false;
+            }
+        };
+
+        struct TextureFromBinary
+        {
+            TextureFromBinary(const void* data, size_t size, juce::String resourceName)
+            {
+                name = std::move(resourceName);
+                image = ImageFileFormat::loadFrom(data, size);
+                jassert(!image.isNull());
             }
 
             Image image;
@@ -334,7 +363,7 @@ private:
         };
 
         juce::OwnedArray<VertexBuffer> vertexBuffers;
-        OwnedArray<TextureFromFile> textures;
+        OwnedArray<TextureFromBinary> textures;
         OpenGLTexture texture1, texture2, texture3;
 
         Vector3D<float> roomSize;

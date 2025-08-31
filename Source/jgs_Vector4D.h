@@ -46,6 +46,7 @@
   ==============================================================================
 */
 #include <JuceHeader.h>
+#include "ExMatrix3D.h"
 
 namespace jgs
 {
@@ -103,7 +104,7 @@ public:
         return ! (x < -epsilon || x > epsilon || y < -epsilon || y > epsilon || z < -epsilon || z > epsilon || w < -epsilon || w > epsilon);
     }
 
-    Vector4D transformed(const Vector4D<Type> other, juce::Matrix3D<Type>& m) noexcept
+    Vector4D transformed(const Vector4D<Type> other, ExMatrix3D<Type>& m) noexcept
     {
         auto&& m2 = m.mat;
 
