@@ -73,7 +73,7 @@ void RoomReverbPluginAudioProcessorEditor::paint (juce::Graphics& g)
 
     g.setColour (juce::Colours::white);
     g.setFont (juce::FontOptions (15.0f));
-    g.drawFittedText ("Hello World!", getLocalBounds(), juce::Justification::centredBottom, 1);
+    g.drawFittedText ("Please populate me!", getLocalBounds(), juce::Justification::centredBottom, 1);
 }
 
 void RoomReverbPluginAudioProcessorEditor::resized()
