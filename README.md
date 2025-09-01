@@ -1,7 +1,9 @@
 # 3D Room Reverb Plugin
 
 A JUCE-based experimental audio plugin (VST3, etc.) that models the acoustics of a simple rectangular room using ray-tracing techniques.  
-The plugin generates an impulse response (IR) of the simulated room which can be loaded into a convolution reverb application, allowing users to hear the reverberation of the modelled space.
+The plugin generates an impulse response (IR) of the simulated room which can be loaded into a convolution reverb application, allowing users to hear the reverberation of the modelled space.  
+  
+![RoomReverbPlugin screeshot](Assets/RoomReverbPlugin_Screenshot.png)
 
 ---
 
