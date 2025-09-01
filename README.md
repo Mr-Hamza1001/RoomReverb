@@ -67,7 +67,8 @@ sudo apt install build-essential cmake pkg-config libfreetype6-dev libx11-dev li
 
 ## 🤝 Contributing
 
-Contributions are welcome!  
+Contributions are welcome!
+Requirements document and project specification can be found in the 'Docs' folder as a guide.
 Areas where help is especially valuable:
 - Optimising the ray-tracing / reflection engine.
 - Improving the IR to prevent distortion.
@@ -88,5 +89,5 @@ For commercial licensing options, please contact the project maintainer.
 
 ## 🙌 Acknowledgements
 
-Built with [JUCE](https://juce.com/), an open-source cross-platform C++ framework for audio and GUI applications.
+Built with [JUCE](https://juce.com/), an open-source cross-platform C++ framework for audio and GUI applications.  
 Help with the camera header and other OpenGL features from [LearnOpenGL](https://learnopengl.com/).
