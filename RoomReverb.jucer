@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<JUCERPROJECT id="NWtL57" name="RoomReverbPlugin" projectType="audioplug" useAppConfig="0"
+<JUCERPROJECT id="NWtL57" name="RoomReverb" projectType="audioplug" useAppConfig="0"
               addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1">
-  <MAINGROUP id="uOv3RL" name="RoomReverbPlugin">
+  <MAINGROUP id="uOv3RL" name="RoomReverb">
     <GROUP id="{C80AA492-CDB5-FF0E-FB48-F7132BB8159E}" name="Assets">
       <FILE id="TcXq7p" name="Bricks060_1K-JPG_Color.jpg" compile="0" resource="1"
             file="Assets/Bricks060_1K-JPG_Color.jpg"/>
